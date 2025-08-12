@@ -1,0 +1,27 @@
+package handler
+
+import (
+	"io"
+	"net/http"
+	"testing"
+
+	"github.com/Sorrowful-free/short-url-service/internal/service"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestFakeIntegration(t *testing.T) {
+
+	Init(service.NewFakeService())
+	shortHandler := MakeShortHandler()
+	originalHandler := MakeOriginalHandler()
+
+	t.Run("check if all url will be pack and unpack", func(t *testing.T) {
+		rr := internalTestMakeShortHandler(t, shortHandler, http.MethodPost, "https://www.google.com", http.StatusCreated)
+		shortUrl, _ := io.ReadAll(rr.Result().Body)
+		assert.NotEmpty(t, shortUrl, "short url must be exist")
+
+		rr = internalTestMakeOriginalHandler(t, originalHandler, http.MethodGet, string(shortUrl), http.StatusTemporaryRedirect)
+		assert.NotEmpty(t, rr.Header().Get("Location"), "Location header shouldn't be empty")
+		assert.NotNil(t, rr.Result().Body, "Location shouldn't be empty")
+	})
+}
