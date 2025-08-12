@@ -5,7 +5,7 @@ import (
 )
 
 func MakeOriginalHandler() http.HandlerFunc {
-	return makeShortHandlerInternal
+	return makeOriginalHandlerInternal
 }
 
 func makeOriginalHandlerInternal(w http.ResponseWriter, r *http.Request) {
@@ -19,6 +19,5 @@ func makeOriginalHandlerInternal(w http.ResponseWriter, r *http.Request) {
 		// todo
 	}
 	w.Header().Add("Content-Type", "text/plain")
-	w.Header().Add("Location", originalUrl)
-	w.WriteHeader(http.StatusTemporaryRedirect)
+	http.Redirect(w, r, originalUrl, http.StatusTemporaryRedirect)
 }

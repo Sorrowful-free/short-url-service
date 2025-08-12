@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 )
 
 func MakeShortHandler() http.HandlerFunc {
@@ -17,7 +17,8 @@ func makeShortHandlerInternal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("Content-Type") != "text/plain" {
-		http.Error(w, "unsuported content type", http.StatusBadRequest)
+		errorMessage := fmt.Sprintf("unsuported content type %s", r.Header.Get("Content-Type"))
+		http.Error(w, errorMessage, http.StatusBadRequest)
 		return
 	}
 	originalUrl, err := io.ReadAll(r.Body)
@@ -29,8 +30,6 @@ func makeShortHandlerInternal(w http.ResponseWriter, r *http.Request) {
 		// todo
 	}
 	w.Header().Add("Content-Type", "text/plain")
-	w.Header().Add("Content-Length", strconv.Itoa(len(shortUrl)))
 	w.WriteHeader(http.StatusCreated)
 	io.WriteString(w, shortUrl)
-
 }
