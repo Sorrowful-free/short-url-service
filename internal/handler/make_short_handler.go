@@ -16,7 +16,7 @@ func makeShortHandlerInternal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Header.Get("Content-Type") != "text/plain" {
+	if r.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
 		errorMessage := fmt.Sprintf("unsuported content type %s", r.Header.Get("Content-Type"))
 		http.Error(w, errorMessage, http.StatusBadRequest)
 		return
