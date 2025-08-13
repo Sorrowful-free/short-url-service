@@ -7,5 +7,5 @@ var (
 )
 
 func Init(urlService service.ShortURLService) {
-	internalUrlService = urlService
+	internalURLService = urlService
 }

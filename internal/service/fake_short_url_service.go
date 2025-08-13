@@ -35,14 +35,14 @@ func (service FakeShortURLService) TryMakeShort(originalURL string) (string, err
 	service.shortURLs[shortURL] = dto
 	service.originalURLs[originalURL] = dto
 
-	return shortUrl, nil
+	return shortURL, nil
 }
 
 func (service FakeShortURLService) TryMakeOriginal(shortURL string) (string, error) {
-	dto, exist := service.shortUrls[shortUrl]
+	dto, exist := service.shortURLs[shortURL]
 
 	if !exist {
-		return "", fmt.Errorf("short url %s doesnot exist ", shortUrl)
+		return "", fmt.Errorf("short url %s doesnot exist ", shortURL)
 	}
 
 	return dto.OriginalURL, nil
