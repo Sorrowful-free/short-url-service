@@ -3,9 +3,9 @@ package handler
 import "github.com/Sorrowful-free/short-url-service/internal/service"
 
 var (
-	internalUrlService service.ShortUrlService
+	internalURLService service.ShortURLService
 )
 
-func Init(urlService service.ShortUrlService) {
+func Init(urlService service.ShortURLService) {
 	internalUrlService = urlService
 }

@@ -1,13 +1,13 @@
 package model
 
-type ShortUrlDto struct {
-	ShortUrl    string
-	OriginalUrl string
+type ShortURLDto struct {
+	ShortURL    string
+	OriginalURL string
 }
 
-func New(shortUrl string, originalUrl string) ShortUrlDto {
-	return ShortUrlDto{
-		ShortUrl:    shortUrl,
-		OriginalUrl: originalUrl,
+func New(shortURL string, originalURL string) ShortURLDto {
+	return ShortURLDto{
+		ShortURL:    shortURL,
+		OriginalURL: originalURL,
 	}
 }

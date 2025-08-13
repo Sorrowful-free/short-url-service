@@ -13,12 +13,13 @@ func makeOriginalHandlerInternal(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unsuported method type", http.StatusBadRequest)
 		return
 	}
-	shortUrl := r.PathValue("id")
-	originalUrl, err := internalUrlService.TryMakeOriginal(shortUrl)
+	shortURL := r.PathValue("id")
+	originalURL, err := internalURLService.TryMakeOriginal(shortURL)
 	if err != nil {
-		// todo
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Add("Location", originalUrl)
+	w.Header().Add("Location", originalURL)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }

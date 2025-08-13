@@ -18,11 +18,13 @@ func TestFakeIntegration(t *testing.T) {
 	t.Run("check if all url will be pack and unpack", func(t *testing.T) {
 		rr := internalTestMakeShortHandler(t, shortHandler, http.MethodPost, "https://www.google.com", http.StatusCreated)
 		shortUrl, _ := io.ReadAll(rr.Result().Body)
+		rr.Result().Body.Close()
 		assert.NotEmpty(t, shortUrl, "short url must be exist")
 
 		rr = internalTestMakeOriginalHandler(t, originalHandler, http.MethodGet, string(shortUrl), http.StatusTemporaryRedirect)
 		assert.NotEmpty(t, rr.Header().Get("Location"), "Location header shouldn't be empty")
 		assert.NotNil(t, rr.Result().Body, "Location shouldn't be empty")
+		rr.Result().Body.Close()
 
 		originalUrl := rr.Result().Header.Get("Location")
 

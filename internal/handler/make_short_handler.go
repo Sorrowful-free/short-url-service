@@ -21,15 +21,17 @@ func makeShortHandlerInternal(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errorMessage, http.StatusBadRequest)
 		return
 	}
-	originalUrl, err := io.ReadAll(r.Body)
+	originalURL, err := io.ReadAll(r.Body)
 	if err != nil {
-
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	shortUrl, err := internalUrlService.TryMakeShort(string(originalUrl))
+	shortURL, err := internalURLService.TryMakeShort(string(originalURL))
 	if err != nil {
-		// todo
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	w.Header().Add("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	io.WriteString(w, shortUrl)
+	io.WriteString(w, shortURL)
 }

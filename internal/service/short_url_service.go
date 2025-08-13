@@ -1,6 +1,6 @@
 package service
 
-type ShortUrlService interface {
-	TryMakeShort(originalUrl string) (string, error)
-	TryMakeOriginal(shortUrl string) (string, error)
+type ShortURLService interface {
+	TryMakeShort(originalURL string) (string, error)
+	TryMakeOriginal(shortURL string) (string, error)
 }

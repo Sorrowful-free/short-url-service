@@ -7,45 +7,45 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
 
-type FakeShortUrlService struct {
-	shortUrls    map[string]model.ShortUrlDto
-	originalUrls map[string]model.ShortUrlDto
+type FakeShortURLService struct {
+	shortURLs    map[string]model.ShortURLDto
+	originalURLs map[string]model.ShortURLDto
 }
 
-func NewFakeService() *FakeShortUrlService {
-	return &FakeShortUrlService{
-		shortUrls:    make(map[string]model.ShortUrlDto),
-		originalUrls: make(map[string]model.ShortUrlDto),
+func NewFakeService() *FakeShortURLService {
+	return &FakeShortURLService{
+		shortURLs:    make(map[string]model.ShortURLDto),
+		originalURLs: make(map[string]model.ShortURLDto),
 	}
 }
 
-func (service FakeShortUrlService) TryMakeShort(originalUrl string) (string, error) {
+func (service FakeShortURLService) TryMakeShort(originalURL string) (string, error) {
 
-	_, exist := service.originalUrls[originalUrl]
+	_, exist := service.originalURLs[originalURL]
 	if exist {
-		return "", fmt.Errorf("url %s already exist ", originalUrl)
+		return "", fmt.Errorf("url %s already exist ", originalURL)
 	}
 
-	shortUrl, err := makeFakeUIDString()
+	shortURL, err := makeFakeUIDString()
 	if err != nil {
-		return shortUrl, err
+		return shortURL, err
 	}
-	dto := model.New(shortUrl, originalUrl)
+	dto := model.New(shortURL, originalURL)
 
-	service.shortUrls[shortUrl] = dto
-	service.originalUrls[originalUrl] = dto
+	service.shortURLs[shortURL] = dto
+	service.originalURLs[originalURL] = dto
 
 	return shortUrl, nil
 }
 
-func (service FakeShortUrlService) TryMakeOriginal(shortUrl string) (string, error) {
+func (service FakeShortURLService) TryMakeOriginal(shortURL string) (string, error) {
 	dto, exist := service.shortUrls[shortUrl]
 
 	if !exist {
 		return "", fmt.Errorf("short url %s doesnot exist ", shortUrl)
 	}
 
-	return dto.OriginalUrl, nil
+	return dto.OriginalURL, nil
 }
 
 func makeFakeUIDString() (string, error) {
