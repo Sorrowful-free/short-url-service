@@ -19,5 +19,6 @@ func makeOriginalHandlerInternal(w http.ResponseWriter, r *http.Request) {
 		// todo
 	}
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
-	http.Redirect(w, r, originalUrl, http.StatusTemporaryRedirect)
+	w.Header().Add("Location", originalUrl)
+	w.WriteHeader(http.StatusTemporaryRedirect)
 }

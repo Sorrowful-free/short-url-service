@@ -3,7 +3,6 @@ package service
 import (
 	"crypto/rand"
 	"fmt"
-	"net/url"
 
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
@@ -22,7 +21,6 @@ func NewFakeService() *FakeShortUrlService {
 
 func (service FakeShortUrlService) TryMakeShort(originalUrl string) (string, error) {
 
-	originalUrl = url.PathEscape(originalUrl)
 	_, exist := service.originalUrls[originalUrl]
 	if exist {
 		return "", fmt.Errorf("url %s already exist ", originalUrl)

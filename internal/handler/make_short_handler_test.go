@@ -29,7 +29,7 @@ func TestMakeShortHandler(t *testing.T) {
 
 func internalTestMakeShortHandler(t *testing.T, handler http.HandlerFunc, method string, body string, expectedCode int) *httptest.ResponseRecorder {
 	req, _ := http.NewRequest(method, "/", io.NopCloser(strings.NewReader(body)))
-	req.Header.Set("Content-Type", "text/plain")
+	req.Header.Set("Content-Type", "text/plain; charset=utf-8")
 	rr := httptest.NewRecorder()
 	handler(rr, req)
 

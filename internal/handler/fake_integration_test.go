@@ -23,5 +23,9 @@ func TestFakeIntegration(t *testing.T) {
 		rr = internalTestMakeOriginalHandler(t, originalHandler, http.MethodGet, string(shortUrl), http.StatusTemporaryRedirect)
 		assert.NotEmpty(t, rr.Header().Get("Location"), "Location header shouldn't be empty")
 		assert.NotNil(t, rr.Result().Body, "Location shouldn't be empty")
+
+		originalUrl := rr.Result().Header.Get("Location")
+
+		assert.Equal(t, "https://www.google.com", originalUrl, "url from location must be the same as original")
 	})
 }
