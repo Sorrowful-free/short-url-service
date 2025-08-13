@@ -13,8 +13,8 @@ func makeOriginalHandlerInternal(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unsuported method type", http.StatusBadRequest)
 		return
 	}
-	shortURL := r.PathValue("id")
-	originalURL, err := internalURLService.TryMakeOriginal(shortURL)
+	shortUID := r.PathValue("id")
+	originalURL, err := internalURLService.TryMakeOriginal(shortUID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
