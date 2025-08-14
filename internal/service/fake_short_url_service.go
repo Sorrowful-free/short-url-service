@@ -34,7 +34,7 @@ func (service FakeShortURLService) TryMakeShort(originalURL string) (string, err
 		return shortUID, err
 	}
 
-	shortURL := fmt.Sprintf("%s/%s", service.baseURL, shortUID)
+	shortURL := fmt.Sprintf("%s://%s/%s", "http", service.baseURL, shortUID)
 	dto := model.New(shortURL, originalURL)
 
 	service.shortURLs[shortUID] = dto
