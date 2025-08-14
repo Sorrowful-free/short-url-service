@@ -22,7 +22,7 @@ func run(address string) error {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /", handler.MakeShortHandler())
-	mux.HandleFunc("GET /{id}/", handler.MakeOriginalHandler())
+	mux.HandleFunc("GET /{id}", handler.MakeOriginalHandler())
 
 	log.Printf("starting server and listening on addres %s ", address)
 	err := http.ListenAndServe(address, mux)
