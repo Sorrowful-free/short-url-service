@@ -18,6 +18,6 @@ func makeOriginalHandlerInternal(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Add("Location", originalURL)
-	w.WriteHeader(http.StatusTemporaryRedirect)
+	http.Redirect(w, r, originalURL, http.StatusTemporaryRedirect)
 	fmt.Printf("process request for short UID:%s, with result:%s\n", shortUID, originalURL)
 }
