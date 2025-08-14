@@ -20,8 +20,9 @@ func TestMakeOriginalHandler(t *testing.T) {
 
 	t.Run("GET method redirects", func(t *testing.T) {
 		rr := internalTestMakeOriginalHandler(t, handler, http.MethodGet, "C754D531", http.StatusTemporaryRedirect)
-		assert.NotEmpty(t, rr.Result().Header.Get("Location"), "Location header shouldn't be empty")
-		rr.Result().Body.Close()
+		result := rr.Result()
+		assert.NotEmpty(t, result.Header.Get("Location"), "Location header shouldn't be empty")
+		result.Body.Close()
 	})
 
 }

@@ -8,7 +8,7 @@ import (
 
 func TestFakeService(t *testing.T) {
 	t.Run("constructor for fake service", func(t *testing.T) {
-		service := NewFakeService()
+		service := NewFakeService("localhost:8080")
 
 		assert.NotNil(t, service.originalURLs, "inner map for original urls must be not nil")
 		assert.NotNil(t, service.shortURLs, "inner map for short urls must be not nil")

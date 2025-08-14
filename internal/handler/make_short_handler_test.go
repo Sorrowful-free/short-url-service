@@ -18,8 +18,9 @@ func TestMakeShortHandler(t *testing.T) {
 
 	t.Run("POST method returns 201", func(t *testing.T) {
 		rr := internalTestMakeShortHandler(t, handler, http.MethodPost, "https://www.google.com", http.StatusCreated)
-		assert.NotNil(t, rr.Result().Body, "Location header shouldn't be empty")
-		rr.Result().Body.Close()
+		result := rr.Result()
+		assert.NotNil(t, result.Body, "Location header shouldn't be empty")
+		result.Body.Close()
 	})
 
 	t.Run("GET method returns 400", func(t *testing.T) {
