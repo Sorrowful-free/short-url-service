@@ -13,7 +13,7 @@ import (
 
 func TestMakeShortHandler(t *testing.T) {
 
-	Init(service.NewFakeService())
+	Init(service.NewFakeService("localhost:8080"))
 	handler := MakeShortHandler()
 
 	t.Run("POST method returns 201", func(t *testing.T) {

@@ -11,7 +11,7 @@ import (
 
 func TestFakeIntegration(t *testing.T) {
 
-	Init(service.NewFakeService())
+	Init(service.NewFakeService("localhost:8080"))
 	shortHandler := MakeShortHandler()
 	originalHandler := MakeOriginalHandler()
 
@@ -22,12 +22,10 @@ func TestFakeIntegration(t *testing.T) {
 		assert.NotEmpty(t, shortURL, "short url must be exist")
 
 		rr = internalTestMakeOriginalHandler(t, originalHandler, http.MethodGet, string(shortURL), http.StatusTemporaryRedirect)
-		assert.NotEmpty(t, rr.Header().Get("Location"), "Location header shouldn't be empty")
-		assert.NotNil(t, rr.Result().Body, "Location shouldn't be empty")
-		rr.Result().Body.Close()
+		header := rr.Result().Header
+		location := header.Get("Location")
 
-		originalUrl := rr.Result().Header.Get("Location")
-
-		assert.Equal(t, "https://www.google.com", originalUrl, "url from location must be the same as original")
+		assert.NotEmpty(t, location, "Location header shouldn't be empty")
+		assert.Equal(t, "https://www.google.com", location, "url from location must be the same as original")
 	})
 }

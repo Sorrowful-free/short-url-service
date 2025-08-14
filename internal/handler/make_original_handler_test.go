@@ -11,7 +11,7 @@ import (
 
 func TestMakeOriginalHandler(t *testing.T) {
 
-	Init(service.NewFakeService())
+	Init(service.NewFakeService("localhost:8080"))
 	handler := MakeOriginalHandler()
 
 	t.Run("POST method returns 400", func(t *testing.T) {
@@ -27,8 +27,7 @@ func TestMakeOriginalHandler(t *testing.T) {
 }
 
 func internalTestMakeOriginalHandler(t *testing.T, handler http.HandlerFunc, method string, shortURL string, expectedCode int) *httptest.ResponseRecorder {
-	req, _ := http.NewRequest(method, "/", nil)
-	req.SetPathValue("id", shortURL)
+	req, _ := http.NewRequest(method, shortURL, nil)
 	req.Header.Set("Content-Type", "text/plain; charset=utf-8")
 	rr := httptest.NewRecorder()
 	handler(rr, req)
