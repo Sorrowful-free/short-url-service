@@ -10,11 +10,10 @@ import (
 
 func main() {
 
-	err := run("http://localhost:8080")
+	err := run("localhost:8080")
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }
 
 func run(address string) error {
@@ -23,7 +22,7 @@ func run(address string) error {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /", handler.MakeShortHandler())
-	mux.HandleFunc("GET /{id}", handler.MakeOriginalHandler())
+	mux.HandleFunc("GET /{id}/", handler.MakeOriginalHandler())
 
 	log.Printf("starting server and listening on addres %s ", address)
 	err := http.ListenAndServe(address, mux)

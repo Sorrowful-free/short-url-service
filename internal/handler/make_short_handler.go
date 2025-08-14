@@ -16,11 +16,6 @@ func makeShortHandlerInternal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
-		errorMessage := fmt.Sprintf("unsuported content type %s", r.Header.Get("Content-Type"))
-		http.Error(w, errorMessage, http.StatusBadRequest)
-		return
-	}
 	originalURL, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -34,4 +29,6 @@ func makeShortHandlerInternal(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
 	io.WriteString(w, shortURL)
+
+	fmt.Printf("process request for original URL:%s, with result:%s\n", originalURL, shortURL)
 }

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -9,10 +10,6 @@ func MakeOriginalHandler() http.HandlerFunc {
 }
 
 func makeOriginalHandlerInternal(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "unsuported method type", http.StatusBadRequest)
-		return
-	}
 	shortUID := r.PathValue("id")
 	originalURL, err := internalURLService.TryMakeOriginal(shortUID)
 	if err != nil {
@@ -22,4 +19,5 @@ func makeOriginalHandlerInternal(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Add("Location", originalURL)
 	w.WriteHeader(http.StatusTemporaryRedirect)
+	fmt.Printf("process request for short UID:%s, with result:%s\n", shortUID, originalURL)
 }
