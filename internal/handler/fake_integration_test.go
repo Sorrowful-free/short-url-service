@@ -14,7 +14,7 @@ func TestFakeIntegration(t *testing.T) {
 	Init(service.NewFakeService("localhost:8080"))
 	shortHandler := MakeShortHandler()
 	originalHandler := MakeOriginalHandler()
-	shortURL := "empty"
+	outsideShortURL := "empty"
 
 	t.Run("check if all url will be pack", func(t *testing.T) {
 		rr := internalTestMakeShortHandler(t, shortHandler, http.MethodPost, "https://www.google.com", http.StatusCreated)
@@ -23,11 +23,12 @@ func TestFakeIntegration(t *testing.T) {
 
 		assert.NotEmpty(t, shortURL, "short url must be exist")
 		result.Body.Close()
+		outsideShortURL = string(shortURL)
 	})
 
 	t.Run("check if original url will be unpack", func(t *testing.T) {
 
-		rr := internalTestMakeOriginalHandler(t, originalHandler, http.MethodGet, string(shortURL), http.StatusTemporaryRedirect)
+		rr := internalTestMakeOriginalHandler(t, originalHandler, http.MethodGet, outsideShortURL, http.StatusTemporaryRedirect)
 		result := rr.Result()
 		header := result.Header
 		location := header.Get("Location")

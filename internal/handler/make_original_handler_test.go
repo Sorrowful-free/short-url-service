@@ -28,7 +28,7 @@ func TestMakeOriginalHandler(t *testing.T) {
 }
 
 func internalTestMakeOriginalHandler(t *testing.T, handler http.HandlerFunc, method string, shortURL string, expectedCode int) *httptest.ResponseRecorder {
-	req, _ := http.NewRequest(method, shortURL, nil)
+	req := httptest.NewRequest(method, shortURL, nil)
 	req.Header.Set("Content-Type", "text/plain; charset=utf-8")
 	rr := httptest.NewRecorder()
 	handler(rr, req)
