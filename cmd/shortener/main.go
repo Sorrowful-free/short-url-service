@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	err := run("localhost:8080")
+	err := run("http://localhost:8080")
 	if err != nil {
 		log.Fatal(err)
 	}
