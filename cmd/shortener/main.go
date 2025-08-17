@@ -17,8 +17,8 @@ func main() {
 }
 
 func run(address string) error {
-	urlService := service.NewFakeService(address)
-	handler.Init(urlService)
+	urlService := service.NewFakeService()
+	handler.Init(urlService, address)
 
 	mux := http.NewServeMux()
 	handler.RegisterMakeShortHandler(mux)
