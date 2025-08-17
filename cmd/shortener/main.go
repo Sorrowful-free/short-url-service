@@ -21,8 +21,8 @@ func run(address string) error {
 	handler.Init(urlService)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /", handler.MakeShortHandler())
-	mux.HandleFunc("GET /{id}", handler.MakeOriginalHandler())
+	handler.RegisterMakeShortHandler(mux)
+	handler.RegisterMakeOriginalHandler(mux)
 
 	log.Printf("starting server and listening on addres %s ", address)
 	err := http.ListenAndServe(address, mux)

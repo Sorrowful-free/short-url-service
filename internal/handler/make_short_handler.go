@@ -6,26 +6,23 @@ import (
 	"net/http"
 )
 
-func MakeShortHandler() http.HandlerFunc {
-	return makeShortHandlerInternal
+func RegisterMakeShortHandler(mux *http.ServeMux) {
+	mux.HandleFunc("POST /", makeShortHandlerInternal)
 }
 
 func makeShortHandlerInternal(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "unsuported method type", http.StatusBadRequest)
-		return
-	}
 
 	originalURL, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	shortURL, err := internalURLService.TryMakeShort(string(originalURL))
+	shortUID, err := internalURLService.TryMakeShort(string(originalURL))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	shortURL := fmt.Sprintf("%s/%s", baseURL, shortUID)
 	w.Header().Add("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
 	io.WriteString(w, shortURL)

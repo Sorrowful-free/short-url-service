@@ -1,8 +1,6 @@
 package service
 
 import (
-	"net/url"
-	"path"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,15 +8,14 @@ import (
 
 func TestFakeService(t *testing.T) {
 
-	address := "localhost:8080"
-	service := NewFakeService(address)
+	service := NewFakeService()
 	originalURL := "http://google.com"
-	shortURL := "http://localhost:8080/1234567890"
+	shortUID := "1234567890"
 
 	t.Run("constructor for fake service", func(t *testing.T) {
 
 		assert.NotNil(t, service.originalURLs, "inner map for original urls must be not nil")
-		assert.NotNil(t, service.shortURLs, "inner map for short urls must be not nil")
+		assert.NotNil(t, service.shortUIDs, "inner map for short urls must be not nil")
 	})
 
 	t.Run("generation of fake uid", func(t *testing.T) {
@@ -30,18 +27,15 @@ func TestFakeService(t *testing.T) {
 
 	t.Run("trying to make short url", func(t *testing.T) {
 
-		tmpShortURL, err := service.TryMakeShort(originalURL)
-		assert.NotEmpty(t, tmpShortURL, "short url must be not empty")
+		tmpShortUID, err := service.TryMakeShort(originalURL)
+		assert.NotEmpty(t, tmpShortUID, "short url must be not empty")
 		assert.NoError(t, err, "short url must generate without any error")
 		_, err = service.TryMakeShort(originalURL)
 		assert.NotEmpty(t, err, "short url must generate error for dublicates")
-		shortURL = tmpShortURL
+		shortUID = tmpShortUID
 	})
 
 	t.Run("trying to make original url", func(t *testing.T) {
-
-		u, _ := url.Parse(shortURL)
-		shortUID := path.Base(u.Path)
 
 		tmpOriginalURL, err := service.TryMakeOriginal(shortUID)
 		assert.NotEmpty(t, tmpOriginalURL, "original url must be not empty")
