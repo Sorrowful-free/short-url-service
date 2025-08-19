@@ -23,7 +23,7 @@ func makeShortHandlerInternal(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
 
-	shortURL := fmt.Sprintf("http://%s/%s", internalBaseURL, shortUID)
+	shortURL := fmt.Sprintf("%s/%s", internalBaseURL, shortUID)
 	c.Response().Header().Set("Content-Type", "text/plain")
 	c.Response().WriteHeader(http.StatusCreated)
 

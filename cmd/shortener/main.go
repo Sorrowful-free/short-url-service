@@ -1,8 +1,10 @@
 package main
 
 import (
+	"flag"
 	"log"
 
+	"github.com/Sorrowful-free/short-url-service/internal/config"
 	"github.com/Sorrowful-free/short-url-service/internal/handler"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
 	"github.com/labstack/echo/v4"
@@ -10,21 +12,26 @@ import (
 
 func main() {
 
-	err := run("localhost:8080")
+	err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(address string) error {
+func run() error {
+
+	flag.Parse()
+
+	localConfig := config.GetLocalConfig()
+
 	urlService := service.NewFakeService()
-	handler.Init(urlService, address)
+	handler.Init(urlService, localConfig.BaseURL)
 
 	e := echo.New()
 	handler.RegisterMakeShortHandler(e)
 	handler.RegisterMakeOriginalHandler(e)
 
-	log.Printf("starting server and listening on addres %s ", address)
-	return e.Start(address)
+	log.Printf("starting server and listening on addres %s ", localConfig.ListenAddr)
+	return e.Start(localConfig.ListenAddr)
 
 }
