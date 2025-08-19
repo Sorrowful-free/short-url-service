@@ -3,21 +3,23 @@ package handler
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
-func RegisterMakeOriginalHandler(mux *http.ServeMux) {
-	mux.HandleFunc("GET /{id}", makeOriginalHandlerInternal)
+func RegisterMakeOriginalHandler(e *echo.Echo) {
+	e.GET("/:id", makeOriginalHandlerInternal)
 }
 
-func makeOriginalHandlerInternal(w http.ResponseWriter, r *http.Request) {
-	shortUID := r.PathValue("id")
+func makeOriginalHandlerInternal(c echo.Context) error {
+	shortUID := c.Param("id")
 	originalURL, err := internalURLService.TryMakeOriginal(shortUID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return c.String(http.StatusInternalServerError, err.Error())
 	}
-	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Add("Location", originalURL)
-	http.Redirect(w, r, originalURL, http.StatusTemporaryRedirect)
+	c.Response().Header().Set("Content-Type", "text/plain; charset=utf-8")
+	c.Response().Header().Set("Location", originalURL)
+
 	fmt.Printf("process request for short UID:%s, with result:%s\n", shortUID, originalURL)
+	return c.Redirect(http.StatusTemporaryRedirect, originalURL)
 }

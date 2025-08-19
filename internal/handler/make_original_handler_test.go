@@ -8,20 +8,21 @@ import (
 	"testing"
 
 	"github.com/Sorrowful-free/short-url-service/internal/service"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMakeOriginalHandler(t *testing.T) {
 	t.Run("positive case make original URL", func(t *testing.T) {
-		mux := http.NewServeMux()
+		e := echo.New()
 		Init(service.NewFakeService(), "localhost:8080")
-		RegisterMakeShortHandler(mux)
-		RegisterMakeOriginalHandler(mux)
+		RegisterMakeShortHandler(e)
+		RegisterMakeOriginalHandler(e)
 
 		originalURL := "http://example.com"
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(originalURL))
 		rr := httptest.NewRecorder()
-		mux.ServeHTTP(rr, req)
+		e.ServeHTTP(rr, req)
 
 		resp := rr.Result()
 		defer resp.Body.Close()
@@ -35,7 +36,7 @@ func TestMakeOriginalHandler(t *testing.T) {
 
 		req = httptest.NewRequest(http.MethodGet, shortURL, nil)
 		rr = httptest.NewRecorder()
-		mux.ServeHTTP(rr, req)
+		e.ServeHTTP(rr, req)
 
 		resp = rr.Result()
 		defer resp.Body.Close()

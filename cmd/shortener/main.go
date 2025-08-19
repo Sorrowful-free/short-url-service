@@ -2,10 +2,10 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/Sorrowful-free/short-url-service/internal/handler"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
@@ -20,11 +20,11 @@ func run(address string) error {
 	urlService := service.NewFakeService()
 	handler.Init(urlService, address)
 
-	mux := http.NewServeMux()
-	handler.RegisterMakeShortHandler(mux)
-	handler.RegisterMakeOriginalHandler(mux)
+	e := echo.New()
+	handler.RegisterMakeShortHandler(e)
+	handler.RegisterMakeOriginalHandler(e)
 
 	log.Printf("starting server and listening on addres %s ", address)
-	err := http.ListenAndServe(address, mux)
-	return err
+	return e.Start(address)
+
 }
