@@ -15,7 +15,7 @@ import (
 func TestMakeOriginalHandler(t *testing.T) {
 	t.Run("positive case make original URL", func(t *testing.T) {
 		e := echo.New()
-		Init(service.NewFakeService(), "localhost:8080")
+		Init(service.NewFakeService(), "http://localhost:8080")
 		RegisterMakeShortHandler(e)
 		RegisterMakeOriginalHandler(e)
 
