@@ -8,26 +8,21 @@ import (
 )
 
 type FakeShortURLService struct {
-	baseURL      string
-	shortUIDs    map[string]model.ShortURLDto
-	originalURLs map[string]model.ShortURLDto
+	baseURL   string
+	shortUIDs map[string]model.ShortURLDto
+	uidLength int
 }
 
-func NewFakeService() *FakeShortURLService {
+func NewFakeService(uidLength int) *FakeShortURLService {
 	return &FakeShortURLService{
-		shortUIDs:    make(map[string]model.ShortURLDto),
-		originalURLs: make(map[string]model.ShortURLDto),
+		shortUIDs: make(map[string]model.ShortURLDto),
+		uidLength: uidLength,
 	}
 }
 
 func (service FakeShortURLService) TryMakeShort(originalURL string) (string, error) {
 
-	_, exist := service.originalURLs[originalURL]
-	if exist {
-		return "", fmt.Errorf("url %s already exist ", originalURL)
-	}
-
-	shortUID, err := makeFakeUIDString()
+	shortUID, err := makeFakeUIDString(service.uidLength)
 
 	if err != nil {
 		return shortUID, err
@@ -36,7 +31,6 @@ func (service FakeShortURLService) TryMakeShort(originalURL string) (string, err
 	dto := model.New(shortUID, originalURL)
 
 	service.shortUIDs[shortUID] = dto
-	service.originalURLs[originalURL] = dto
 
 	return shortUID, nil
 }
@@ -51,8 +45,8 @@ func (service FakeShortURLService) TryMakeOriginal(shortUID string) (string, err
 	return dto.OriginalURL, nil
 }
 
-func makeFakeUIDString() (string, error) {
-	b := make([]byte, 4)
+func makeFakeUIDString(uidLength int) (string, error) {
+	b := make([]byte, uidLength)
 	_, err := rand.Read(b)
 	if err != nil {
 		return "", err
