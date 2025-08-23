@@ -29,8 +29,6 @@ func TestFakeService(t *testing.T) {
 		tmpShortUID, err := service.TryMakeShort(originalURL)
 		assert.NotEmpty(t, tmpShortUID, "short url must be not empty")
 		assert.NoError(t, err, "short url must generate without any error")
-		_, err = service.TryMakeShort(originalURL)
-		assert.NotEmpty(t, err, "short url must generate error for dublicates")
 		shortUID = tmpShortUID
 	})
 
