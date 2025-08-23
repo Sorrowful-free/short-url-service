@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 
 	"github.com/Sorrowful-free/short-url-service/internal/config"
@@ -19,17 +18,10 @@ func main() {
 }
 
 func run() error {
-
-	flag.Parse()
-
 	localConfig := config.GetLocalConfig()
 
-	urlService := service.NewFakeService()
-	handler.Init(urlService, localConfig.BaseURL)
-
 	e := echo.New()
-	handler.RegisterMakeShortHandler(e)
-	handler.RegisterMakeOriginalHandler(e)
+	handler.NewHandlers(e, service.NewFakeService(localConfig.UIDLength), localConfig.BaseURL).RegisterHandlers()
 
 	log.Printf("starting server and listening on addres %s ", localConfig.ListenAddr)
 	return e.Start(localConfig.ListenAddr)
