@@ -8,7 +8,7 @@ import (
 
 func TestFakeService(t *testing.T) {
 
-	service := NewFakeService(8)
+	service := NewSimpleService(8)
 	originalURL := "http://google.com"
 	shortUID := "1234567890"
 
@@ -19,7 +19,7 @@ func TestFakeService(t *testing.T) {
 
 	t.Run("generation of fake uid", func(t *testing.T) {
 
-		uid, err := makeFakeUIDString(8)
+		uid, err := makeSimpleUIDString(8)
 		assert.NotEmpty(t, uid, "generation of uid must generate some string")
 		assert.NoError(t, err, "generation of uid must complete without any error")
 	})
