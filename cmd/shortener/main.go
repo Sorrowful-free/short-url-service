@@ -21,9 +21,6 @@ func run() error {
 	localConfig := config.GetLocalConfig()
 
 	e := echo.New()
-	handler.NewHandlers(e, service.NewFakeService(localConfig.UIDLength), localConfig.BaseURL).RegisterHandlers()
-
-	log.Printf("starting server and listening on addres %s ", localConfig.ListenAddr)
+	handler.NewHandlers(e, service.NewSimpleService(localConfig.UIDLength), localConfig.BaseURL).RegisterHandlers()
 	return e.Start(localConfig.ListenAddr)
-
 }

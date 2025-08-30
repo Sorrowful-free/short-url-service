@@ -5,6 +5,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const (
+	MakeShortPath         = "/"
+	MakeOriginalPath      = "/:id"
+	OriginalPathParam     = "id"
+	HeaderContentType     = "Content-Type"
+	HeaderContentTypeText = "text/plain; charset=utf-8"
+	HeaderLocation        = "Location"
+)
+
 type Handlers struct {
 	internalEcho       *echo.Echo
 	internalURLService service.ShortURLService
