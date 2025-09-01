@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -28,7 +27,6 @@ func RegisterMakeShortHandler(h *Handlers) {
 		c.Response().Header().Set(HeaderContentType, HeaderContentTypeText)
 		c.Response().WriteHeader(http.StatusCreated)
 
-		fmt.Printf("process request for original URL:%s, with result:%s\n", originalURL, shortURL)
 		return c.String(http.StatusCreated, shortURL)
 	})
 }
