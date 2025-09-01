@@ -4,30 +4,31 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/labstack/echo/v4"
 )
 
-func RegisterMakeShortHandler(e *echo.Echo) {
-	e.POST("/", makeShortHandlerInternal)
-}
+func RegisterMakeShortHandler(h *Handlers) {
+	h.internalEcho.POST(MakeShortPath, func(c echo.Context) error {
+		originalURL, err := io.ReadAll(c.Request().Body)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+		shortUID, err := h.internalURLService.TryMakeShort(string(originalURL))
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
 
-func makeShortHandlerInternal(c echo.Context) error {
+		shortURL, err := url.JoinPath(h.internalBaseURL, shortUID)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
 
-	originalURL, err := io.ReadAll(c.Request().Body)
-	if err != nil {
-		return c.String(http.StatusInternalServerError, err.Error())
-	}
-	shortUID, err := internalURLService.TryMakeShort(string(originalURL))
-	if err != nil {
-		return c.String(http.StatusInternalServerError, err.Error())
-	}
+		c.Response().Header().Set(HeaderContentType, HeaderContentTypeText)
+		c.Response().WriteHeader(http.StatusCreated)
 
-	shortURL := fmt.Sprintf("http://%s/%s", internalBaseURL, shortUID)
-	c.Response().Header().Set("Content-Type", "text/plain")
-	c.Response().WriteHeader(http.StatusCreated)
-
-	fmt.Printf("process request for original URL:%s, with result:%s\n", originalURL, shortURL)
-	return c.String(http.StatusCreated, shortURL)
-
+		fmt.Printf("process request for original URL:%s, with result:%s\n", originalURL, shortURL)
+		return c.String(http.StatusCreated, shortURL)
+	})
 }

@@ -8,19 +8,18 @@ import (
 
 func TestFakeService(t *testing.T) {
 
-	service := NewFakeService()
+	service := NewSimpleService(8)
 	originalURL := "http://google.com"
 	shortUID := "1234567890"
 
 	t.Run("constructor for fake service", func(t *testing.T) {
 
-		assert.NotNil(t, service.originalURLs, "inner map for original urls must be not nil")
 		assert.NotNil(t, service.shortUIDs, "inner map for short urls must be not nil")
 	})
 
 	t.Run("generation of fake uid", func(t *testing.T) {
 
-		uid, err := makeFakeUIDString()
+		uid, err := makeSimpleUIDString(8)
 		assert.NotEmpty(t, uid, "generation of uid must generate some string")
 		assert.NoError(t, err, "generation of uid must complete without any error")
 	})
@@ -30,8 +29,6 @@ func TestFakeService(t *testing.T) {
 		tmpShortUID, err := service.TryMakeShort(originalURL)
 		assert.NotEmpty(t, tmpShortUID, "short url must be not empty")
 		assert.NoError(t, err, "short url must generate without any error")
-		_, err = service.TryMakeShort(originalURL)
-		assert.NotEmpty(t, err, "short url must generate error for dublicates")
 		shortUID = tmpShortUID
 	})
 

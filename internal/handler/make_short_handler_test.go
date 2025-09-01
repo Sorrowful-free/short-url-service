@@ -15,11 +15,10 @@ import (
 func TestMakeShortHandler(t *testing.T) {
 	t.Run("positive case create short URL", func(t *testing.T) {
 		e := echo.New()
-		Init(service.NewFakeService(), "localhost:8080")
-		RegisterMakeShortHandler(e)
+		NewHandlers(e, service.NewSimpleService(8), "localhost:8080").RegisterHandlers()
 
 		originalURL := "http://example.com"
-		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(originalURL))
+		req := httptest.NewRequest(http.MethodPost, MakeShortPath, bytes.NewBufferString(originalURL))
 		rr := httptest.NewRecorder()
 		e.ServeHTTP(rr, req)
 
