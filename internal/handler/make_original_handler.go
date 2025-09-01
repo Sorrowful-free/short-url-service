@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-func MakeOriginalHandler() http.HandlerFunc {
-	return makeOriginalHandlerInternal
+func RegisterMakeOriginalHandler(mux *http.ServeMux) {
+	mux.HandleFunc("GET /{id}", makeOriginalHandlerInternal)
 }
 
 func makeOriginalHandlerInternal(w http.ResponseWriter, r *http.Request) {

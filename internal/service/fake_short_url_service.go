@@ -9,14 +9,13 @@ import (
 
 type FakeShortURLService struct {
 	baseURL      string
-	shortURLs    map[string]model.ShortURLDto
+	shortUIDs    map[string]model.ShortURLDto
 	originalURLs map[string]model.ShortURLDto
 }
 
-func NewFakeService(baseURL string) *FakeShortURLService {
+func NewFakeService() *FakeShortURLService {
 	return &FakeShortURLService{
-		baseURL:      baseURL,
-		shortURLs:    make(map[string]model.ShortURLDto),
+		shortUIDs:    make(map[string]model.ShortURLDto),
 		originalURLs: make(map[string]model.ShortURLDto),
 	}
 }
@@ -34,17 +33,16 @@ func (service FakeShortURLService) TryMakeShort(originalURL string) (string, err
 		return shortUID, err
 	}
 
-	shortURL := fmt.Sprintf("%s://%s/%s", "http", service.baseURL, shortUID)
-	dto := model.New(shortURL, originalURL)
+	dto := model.New(shortUID, originalURL)
 
-	service.shortURLs[shortUID] = dto
+	service.shortUIDs[shortUID] = dto
 	service.originalURLs[originalURL] = dto
 
-	return shortURL, nil
+	return shortUID, nil
 }
 
 func (service FakeShortURLService) TryMakeOriginal(shortUID string) (string, error) {
-	dto, exist := service.shortURLs[shortUID]
+	dto, exist := service.shortUIDs[shortUID]
 
 	if !exist {
 		return "", fmt.Errorf("short url %s doesnot exist ", shortUID)

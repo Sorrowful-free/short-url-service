@@ -17,12 +17,12 @@ func main() {
 }
 
 func run(address string) error {
-	urlService := service.NewFakeService(address)
-	handler.Init(urlService)
+	urlService := service.NewFakeService()
+	handler.Init(urlService, address)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /", handler.MakeShortHandler())
-	mux.HandleFunc("GET /{id}", handler.MakeOriginalHandler())
+	handler.RegisterMakeShortHandler(mux)
+	handler.RegisterMakeOriginalHandler(mux)
 
 	log.Printf("starting server and listening on addres %s ", address)
 	err := http.ListenAndServe(address, mux)
