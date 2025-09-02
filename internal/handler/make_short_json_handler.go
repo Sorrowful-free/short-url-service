@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/Sorrowful-free/short-url-service/internal/consts"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/labstack/echo/v4"
 )
@@ -28,7 +29,7 @@ func RegisterMakeShortJSONHandler(h *Handlers) {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
-		c.Response().Header().Set(HeaderContentType, HeaderContentTypeJSON)
+		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeJSON)
 		c.Response().WriteHeader(http.StatusCreated)
 
 		shortResponse := model.ShortResponse{
