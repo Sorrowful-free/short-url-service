@@ -2,23 +2,29 @@ package handler
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMakeShortHandler(t *testing.T) {
+func TestMakeShortJSONHandler(t *testing.T) {
 	t.Run("positive case create short URL", func(t *testing.T) {
 		e := echo.New()
 		NewHandlers(e, service.NewSimpleService(8), "http://localhost:8080").RegisterHandlers()
 
 		originalURL := "http://example.com"
-		req := httptest.NewRequest(http.MethodPost, MakeShortPath, bytes.NewBufferString(originalURL))
+		shortRequest := model.ShortRequest{
+			OriginalURL: originalURL,
+		}
+		jsonRequest, _ := json.Marshal(shortRequest)
+		req := httptest.NewRequest(http.MethodPost, MakeShortJSONPath, bytes.NewBuffer(jsonRequest))
 		rr := httptest.NewRecorder()
 		e.ServeHTTP(rr, req)
 
@@ -28,7 +34,10 @@ func TestMakeShortHandler(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, resp.StatusCode, "expected status code %d, received %d", http.StatusCreated, resp.StatusCode)
 
 		body, _ := io.ReadAll(resp.Body)
-		shortURL := string(body)
+
+		shortResponse := model.ShortResponse{}
+		json.Unmarshal(body, &shortResponse)
+		shortURL := shortResponse.ShortURL
 
 		assert.NotEmpty(t, shortURL, "short URL must be not empty")
 	})
