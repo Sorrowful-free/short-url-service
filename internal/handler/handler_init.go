@@ -10,11 +10,6 @@ const (
 	MakeShortJSONPath = "/api/shorten"
 	MakeOriginalPath  = "/:id"
 	OriginalPathParam = "id"
-
-	HeaderContentType     = "Content-Type"
-	HeaderContentTypeText = "text/plain; charset=utf-8"
-	HeaderContentTypeJSON = "application/json; charset=utf-8"
-	HeaderLocation        = "Location"
 )
 
 type Handlers struct {
