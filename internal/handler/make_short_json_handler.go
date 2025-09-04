@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
+	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/labstack/echo/v4"
 )
@@ -43,5 +44,5 @@ func RegisterMakeShortJSONHandler(h *Handlers) {
 		}
 
 		return nil
-	})
+	}, middlewares.GzipMiddleware)
 }
