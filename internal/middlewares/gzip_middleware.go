@@ -35,7 +35,7 @@ func GzipMiddleware(logger *logger.Logger) echo.MiddlewareFunc {
 			contentType = c.Response().Header().Get(consts.HeaderContentType)
 			isAcceptedContent := strings.Contains(contentType, consts.HeaderContentTypeHTML) || strings.Contains(contentType, consts.HeaderContentTypeJSON)
 
-			if isGzipAccepted && isAcceptedContent {
+			if isGzipAccepted {
 				gzw := compression.NewGzipResponseWriter(c.Response())
 				defer gzw.Close()
 				c.Response().Writer = gzw
