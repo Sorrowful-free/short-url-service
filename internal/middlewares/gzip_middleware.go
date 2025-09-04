@@ -6,38 +6,43 @@ import (
 
 	"github.com/Sorrowful-free/short-url-service/internal/compression"
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
+	"github.com/Sorrowful-free/short-url-service/internal/logger"
 	"github.com/labstack/echo/v4"
 )
 
-func GzipMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
+func GzipMiddleware(logger *logger.Logger) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
 
-		contentEncoding := c.Request().Header.Get(consts.HeaderContentEncoding)
-		isGzipRequested := strings.Contains(contentEncoding, consts.HeaderEncodingGzip)
+			contentEncoding := c.Request().Header.Get(consts.HeaderContentEncoding)
+			isGzipRequested := strings.Contains(contentEncoding, consts.HeaderEncodingGzip)
 
-		contentType := c.Request().Header.Get(consts.HeaderContentType)
-		isSupportedContent := strings.Contains(contentType, consts.HeaderContentTypeHTML) || strings.Contains(contentType, consts.HeaderContentTypeJSON)
+			contentType := c.Request().Header.Get(consts.HeaderContentType)
+			isSupportedContent := strings.Contains(contentType, consts.HeaderContentTypeHTML) || strings.Contains(contentType, consts.HeaderContentTypeJSON)
 
-		if isGzipRequested && isSupportedContent {
-			gzr, err := compression.NewGzipRequestReader(c.Request())
-			if err != nil {
-				return c.String(http.StatusInternalServerError, err.Error())
+			if isGzipRequested && isSupportedContent {
+				gzr, err := compression.NewGzipRequestReader(c.Request())
+				if err != nil {
+					return c.String(http.StatusInternalServerError, err.Error())
+				}
+				defer gzr.Close()
+				c.Request().Body = gzr
+				logger.Info("gzip request reader created", "contentEncoding", contentEncoding, "isGzipRequested", isGzipRequested, "isSupportedContent", isSupportedContent)
 			}
-			defer gzr.Close()
-			c.Request().Body = gzr
+
+			acceptEncoding := c.Request().Header.Get(consts.HeaderAcceptEncoding)
+			isGzipAccepted := strings.Contains(acceptEncoding, consts.HeaderEncodingGzip)
+			contentType = c.Response().Header().Get(consts.HeaderContentType)
+			isAcceptedContent := strings.Contains(contentType, consts.HeaderContentTypeHTML) || strings.Contains(contentType, consts.HeaderContentTypeJSON)
+
+			if isGzipAccepted && isAcceptedContent {
+				gzw := compression.NewGzipResponseWriter(c.Response())
+				defer gzw.Close()
+				c.Response().Writer = gzw
+				logger.Info("gzip response writer created", "contentType", contentType, "isGzipAccepted", isGzipAccepted, "isAcceptedContent", isAcceptedContent)
+			}
+
+			return next(c)
 		}
-
-		acceptEncoding := c.Request().Header.Get(consts.HeaderAcceptEncoding)
-		isGzipAccepted := strings.Contains(acceptEncoding, consts.HeaderEncodingGzip)
-		contentType = c.Response().Header().Get(consts.HeaderContentType)
-		isAcceptedContent := strings.Contains(contentType, consts.HeaderContentTypeHTML) || strings.Contains(contentType, consts.HeaderContentTypeJSON)
-
-		if isGzipAccepted && isAcceptedContent {
-			gzw := compression.NewGzipResponseWriter(c.Response())
-			defer gzw.Close()
-			c.Response().Writer = gzw
-		}
-
-		return next(c)
 	}
 }

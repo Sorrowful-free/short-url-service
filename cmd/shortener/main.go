@@ -28,7 +28,7 @@ func run() error {
 		return err
 	}
 	e.Use(middlewares.LoggerAsMiddleware(l))
-	e.Use(middlewares.GzipMiddleware)
+	e.Use(middlewares.GzipMiddleware(l))
 	s := service.NewSimpleService(lc.UIDLength, l)
 	handler.NewHandlers(e, s, lc.BaseURL).RegisterHandlers()
 	return e.Start(lc.ListenAddr)
