@@ -30,7 +30,7 @@ func GzipMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		acceptEncoding := c.Request().Header.Get(consts.HeaderAcceptEncoding)
 		isGzipAccepted := strings.Contains(acceptEncoding, consts.HeaderEncodingGzip)
 
-		if isGzipAccepted && isSupportedContent {
+		if isGzipAccepted {
 			gzw := compression.NewGzipResponseWriter(c.Response())
 			defer gzw.Close()
 			c.Response().Writer = gzw
