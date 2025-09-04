@@ -6,11 +6,14 @@ import (
 )
 
 const (
-	MakeShortPath         = "/"
-	MakeOriginalPath      = "/:id"
-	OriginalPathParam     = "id"
+	MakeShortPath     = "/"
+	MakeShortJSONPath = "/api/shorten"
+	MakeOriginalPath  = "/:id"
+	OriginalPathParam = "id"
+
 	HeaderContentType     = "Content-Type"
 	HeaderContentTypeText = "text/plain; charset=utf-8"
+	HeaderContentTypeJSON = "application/json; charset=utf-8"
 	HeaderLocation        = "Location"
 )
 
@@ -31,5 +34,6 @@ func NewHandlers(echo *echo.Echo, urlService service.ShortURLService, baseURL st
 func (h *Handlers) RegisterHandlers() *Handlers {
 	RegisterMakeShortHandler(h)
 	RegisterMakeOriginalHandler(h)
+	RegisterMakeShortJSONHandler(h)
 	return h
 }
