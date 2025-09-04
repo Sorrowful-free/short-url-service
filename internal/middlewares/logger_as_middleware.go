@@ -31,7 +31,7 @@ func LoggerAsMiddleware(l *logger.Logger) echo.MiddlewareFunc {
 				)
 				l.Info("response processed: ",
 					"code", c.Response().Status,
-					"headers", c.Response().Header,
+					"headers", c.Response().Header(),
 					"size", c.Response().Size)
 			}
 			return err
