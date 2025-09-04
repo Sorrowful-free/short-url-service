@@ -29,7 +29,7 @@ func GzipMiddleware(logger *logger.Logger) echo.MiddlewareFunc {
 				c.Request().Body = gzr
 				logger.Info("gzip request reader created", "contentEncoding", contentEncoding, "isGzipRequested", isGzipRequested, "isSupportedContent", isSupportedContent)
 			}
-
+			//
 			acceptEncoding := c.Request().Header.Get(consts.HeaderAcceptEncoding)
 			isGzipAccepted := strings.Contains(acceptEncoding, consts.HeaderEncodingGzip)
 			contentType = c.Response().Header().Get(consts.HeaderContentType)
