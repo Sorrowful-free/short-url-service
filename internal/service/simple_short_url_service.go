@@ -5,18 +5,24 @@ import (
 	"fmt"
 
 	"github.com/Sorrowful-free/short-url-service/internal/model"
+	"github.com/Sorrowful-free/short-url-service/internal/repository"
 )
 
 type SimpleShortURLService struct {
-	shortUIDs map[string]model.ShortURLDto
-	uidLength int
+	shortUIDs          map[string]model.ShortURLDto
+	uidLength          int
+	ShortURLRepository repository.ShortURLRepository
 }
 
-func NewSimpleService(uidLength int) *SimpleShortURLService {
-	return &SimpleShortURLService{
-		shortUIDs: make(map[string]model.ShortURLDto),
-		uidLength: uidLength,
+func NewSimpleService(uidLength int, fileStoragePath string) *SimpleShortURLService {
+	shortURLRepository := repository.NewSimpleShortURLRepository(fileStoragePath)
+	service := SimpleShortURLService{
+		shortUIDs:          make(map[string]model.ShortURLDto),
+		uidLength:          uidLength,
+		ShortURLRepository: shortURLRepository,
 	}
+	service.restoreShortURLsFromRepository(fileStoragePath)
+	return &service
 }
 
 func (service SimpleShortURLService) TryMakeShort(originalURL string) (string, error) {
@@ -36,6 +42,8 @@ func (service SimpleShortURLService) TryMakeShort(originalURL string) (string, e
 	dto := model.New(shortUID, originalURL)
 
 	service.shortUIDs[shortUID] = dto
+
+	service.ShortURLRepository.Save(dto)
 
 	return shortUID, nil
 }
@@ -58,4 +66,16 @@ func makeSimpleUIDString(uidLength int) (string, error) {
 	}
 
 	return fmt.Sprintf("%X", b), nil
+}
+
+func (service SimpleShortURLService) restoreShortURLsFromRepository(fileStoragePath string) error {
+	shortURLs, err := service.ShortURLRepository.Load()
+	if err != nil {
+		return err
+	}
+	service.shortUIDs = make(map[string]model.ShortURLDto)
+	for _, shortSafeURL := range shortURLs {
+		service.shortUIDs[shortSafeURL.ShortUID] = model.New(shortSafeURL.ShortUID, shortSafeURL.OriginalURL)
+	}
+	return nil
 }

@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Sorrowful-free/short-url-service/internal/consts"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
 	"github.com/labstack/echo/v4"
@@ -17,9 +18,9 @@ import (
 func TestMakeShortJSONHandler(t *testing.T) {
 	t.Run("positive case create short URL", func(t *testing.T) {
 		e := echo.New()
-		NewHandlers(e, service.NewSimpleService(8), "http://localhost:8080").RegisterHandlers()
+		NewHandlers(e, service.NewSimpleService(consts.TestUIDLength, consts.TestFileStoragePath), consts.TestBaseURL).RegisterHandlers()
 
-		originalURL := "http://example.com"
+		originalURL := consts.TestOriginalURL
 		shortRequest := model.ShortRequest{
 			OriginalURL: originalURL,
 		}
