@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Sorrowful-free/short-url-service/internal/logger"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,11 @@ import (
 func TestMakeOriginalHandler(t *testing.T) {
 	t.Run("positive case make original URL", func(t *testing.T) {
 		e := echo.New()
-		NewHandlers(e, service.NewSimpleService(8), "http://localhost:8080").RegisterHandlers()
+		l, err := logger.NewLogger()
+		if err != nil {
+			t.Fatal(err)
+		}
+		NewHandlers(e, service.NewSimpleService(8, l), "http://localhost:8080").RegisterHandlers()
 
 		originalURL := "http://example.com"
 		req := httptest.NewRequest(http.MethodPost, MakeShortPath, bytes.NewBufferString(originalURL))

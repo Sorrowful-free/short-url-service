@@ -4,18 +4,21 @@ import (
 	"crypto/rand"
 	"fmt"
 
+	"github.com/Sorrowful-free/short-url-service/internal/logger"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
 
 type SimpleShortURLService struct {
 	shortUIDs map[string]model.ShortURLDto
 	uidLength int
+	logger    *logger.Logger
 }
 
-func NewSimpleService(uidLength int) *SimpleShortURLService {
+func NewSimpleService(uidLength int, logger *logger.Logger) *SimpleShortURLService {
 	return &SimpleShortURLService{
 		shortUIDs: make(map[string]model.ShortURLDto),
 		uidLength: uidLength,
+		logger:    logger,
 	}
 }
 
@@ -36,6 +39,7 @@ func (service SimpleShortURLService) TryMakeShort(originalURL string) (string, e
 	dto := model.New(shortUID, originalURL)
 
 	service.shortUIDs[shortUID] = dto
+	service.logger.Info("short url created", "shortUID", shortUID, "originalURL", originalURL)
 
 	return shortUID, nil
 }
@@ -46,6 +50,8 @@ func (service SimpleShortURLService) TryMakeOriginal(shortUID string) (string, e
 	if !exist {
 		return "", fmt.Errorf("short url %s doesnot exist ", shortUID)
 	}
+
+	service.logger.Info("original url found", "shortUID", shortUID, "originalURL", dto.OriginalURL)
 
 	return dto.OriginalURL, nil
 }
