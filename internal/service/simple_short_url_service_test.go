@@ -3,12 +3,17 @@ package service
 import (
 	"testing"
 
+	"github.com/Sorrowful-free/short-url-service/internal/logger"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFakeService(t *testing.T) {
 
-	service := NewSimpleService(8)
+	l, err := logger.NewLogger()
+	if err != nil {
+		t.Fatal(err)
+	}
+	service := NewSimpleService(8, l)
 	originalURL := "http://google.com"
 	shortUID := "1234567890"
 
