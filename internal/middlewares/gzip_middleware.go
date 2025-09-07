@@ -20,7 +20,7 @@ func GzipMiddleware(logger *logger.Logger) echo.MiddlewareFunc {
 			contentType := c.Request().Header.Get(consts.HeaderContentType)
 			isSupportedContent := requestContentType(contentType)
 
-			if isGzipRequested && isSupportedContent {
+			if isGzipRequested {
 				gzr, err := compression.NewGzipRequestReader(c.Request())
 				if err != nil {
 					return c.String(http.StatusInternalServerError, err.Error())
