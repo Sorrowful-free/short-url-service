@@ -28,8 +28,8 @@ func run() error {
 		return err
 	}
 	e.Use(middlewares.LoggerAsMiddleware(l))
-	e.Use(middlewares.GzipMiddleware)
-	s := service.NewSimpleService(lc.UIDLength, lc.FileStoragePath)
+	e.Use(middlewares.GzipMiddleware(l))
+	s := service.NewSimpleService(lc.UIDLength, lc.FileStoragePath, l)
 	handler.NewHandlers(e, s, lc.BaseURL).RegisterHandlers()
 	return e.Start(lc.ListenAddr)
 }

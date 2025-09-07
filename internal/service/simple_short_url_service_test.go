@@ -4,12 +4,17 @@ import (
 	"testing"
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
+	"github.com/Sorrowful-free/short-url-service/internal/logger"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFService(t *testing.T) {
 
-	service := NewSimpleService(consts.TestUIDLength, consts.TestFileStoragePath)
+	l, err := logger.NewLogger()
+	if err != nil {
+		t.Fatal(err)
+	}
+	service := NewSimpleService(consts.TestUIDLength, consts.TestFileStoragePath, l)
 	originalURL := consts.TestOriginalURL
 	shortUID := consts.TestShortUID
 
