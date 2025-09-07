@@ -48,7 +48,7 @@ func GzipMiddleware(logger *logger.Logger) echo.MiddlewareFunc {
 }
 
 func acceptContentType(contentType string) bool {
-	return strings.Contains(contentType, consts.HeaderContentTypeHTML) || strings.Contains(contentType, consts.HeaderContentTypeJSON) || strings.Contains(contentType, consts.HeaderContentTypeText)
+	return strings.Contains(contentType, consts.HeaderContentTypeHTML) || strings.Contains(contentType, consts.HeaderContentTypeJSON)
 }
 
 func requestContentType(contentType string) bool {
