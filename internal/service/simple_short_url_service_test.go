@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFService(t *testing.T) {
+func TestSimpleShortURLService(t *testing.T) {
 
 	l, err := logger.NewLogger()
 	if err != nil {
