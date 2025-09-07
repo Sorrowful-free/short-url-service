@@ -18,7 +18,7 @@ func GzipMiddleware(logger *logger.Logger) echo.MiddlewareFunc {
 			isGzipRequested := strings.Contains(contentEncoding, consts.HeaderEncodingGzip)
 
 			contentType := c.Request().Header.Get(consts.HeaderContentType)
-			isSupportedContent := strings.Contains(contentType, consts.HeaderContentTypeHTML) || strings.Contains(contentType, consts.HeaderContentTypeJSON)
+			isSupportedContent := requestContentType(contentType)
 
 			if isGzipRequested && isSupportedContent {
 				gzr, err := compression.NewGzipRequestReader(c.Request())
@@ -33,7 +33,7 @@ func GzipMiddleware(logger *logger.Logger) echo.MiddlewareFunc {
 			acceptEncoding := c.Request().Header.Get(consts.HeaderAcceptEncoding)
 			isGzipAccepted := strings.Contains(acceptEncoding, consts.HeaderEncodingGzip)
 			contentType = c.Response().Header().Get(consts.HeaderContentType)
-			isAcceptedContent := strings.Contains(contentType, consts.HeaderContentTypeHTML) || strings.Contains(contentType, consts.HeaderContentTypeJSON)
+			isAcceptedContent := acceptContentType(contentType)
 
 			if isGzipAccepted {
 				gzw := compression.NewGzipResponseWriter(c.Response())
@@ -45,4 +45,12 @@ func GzipMiddleware(logger *logger.Logger) echo.MiddlewareFunc {
 			return next(c)
 		}
 	}
+}
+
+func acceptContentType(contentType string) bool {
+	return strings.Contains(contentType, consts.HeaderContentTypeHTML) || strings.Contains(contentType, consts.HeaderContentTypeJSON) || strings.Contains(contentType, consts.HeaderContentTypeText)
+}
+
+func requestContentType(contentType string) bool {
+	return strings.Contains(contentType, consts.HeaderContentTypeHTML) || strings.Contains(contentType, consts.HeaderContentTypeJSON) || strings.Contains(contentType, consts.HeaderContentTypeText)
 }
