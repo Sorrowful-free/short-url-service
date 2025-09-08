@@ -30,8 +30,13 @@ func (sfs *SimpleFileStorage) SafeAll(shortURLs []model.ShortURLSafeDto) error {
 
 func (sfs *SimpleFileStorage) LoadAll() ([]model.ShortURLSafeDto, error) {
 	shortURLs := make([]model.ShortURLSafeDto, 0)
+
 	jsonFile, err := os.Open(sfs.fileStoragePath)
-	if err != nil {
+
+	//if file doesn't exist we must run app anyway but return empty list
+	if os.IsNotExist(err) {
+		return shortURLs, nil
+	} else if err != nil {
 		return nil, err
 	}
 	defer jsonFile.Close()
