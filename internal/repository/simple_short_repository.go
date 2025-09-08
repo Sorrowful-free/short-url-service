@@ -1,59 +1,48 @@
 package repository
 
 import (
-	"encoding/json"
-	"os"
+	"fmt"
 
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
 
 type SimpleShortURLRepository struct {
-	shortURLs       []model.ShortURLSafeDto
-	fileStoragePath string
+	shortURLs   []model.ShortURLSafeDto
+	fileStorage FileStorage
 }
 
-func NewSimpleShortURLRepository(fileStoragePath string) *SimpleShortURLRepository {
-	if fileStoragePath != "" {
-		shortURLs, err := loadFromFile(fileStoragePath)
-		if err != nil {
-			return &SimpleShortURLRepository{
-				shortURLs:       shortURLs,
-				fileStoragePath: fileStoragePath,
-			}
-		}
+func NewSimpleShortURLRepository(fileStoragePath string) (ShortURLRepository, error) {
+	fileStorage := NewSimpleFileStorage(fileStoragePath)
+	shortURLs, err := fileStorage.LoadAll()
+	if err != nil {
+		return nil, err
 	}
 	return &SimpleShortURLRepository{
-		shortURLs: make([]model.ShortURLSafeDto, 0),
-	}
+		shortURLs:   shortURLs,
+		fileStorage: fileStorage,
+	}, nil
 }
 
 func (r *SimpleShortURLRepository) Save(shortURL model.ShortURLDto) error {
 	r.shortURLs = append(r.shortURLs, model.NewShortURLSafeDto(shortURL))
-	r.safeToFile()
+	r.fileStorage.SafeAll(r.shortURLs)
 	return nil
 }
 
-func (r *SimpleShortURLRepository) Load() ([]model.ShortURLSafeDto, error) {
-	return r.shortURLs, nil
+func (r *SimpleShortURLRepository) ContainsUID(shortUID string) bool {
+	for _, shortURL := range r.shortURLs {
+		if shortURL.ShortUID == shortUID {
+			return true
+		}
+	}
+	return false
 }
 
-func (r *SimpleShortURLRepository) safeToFile() error {
-	jsonFile, err := os.Create(r.fileStoragePath)
-	if err != nil {
-		return err
+func (r *SimpleShortURLRepository) GetByUID(shortUID string) (model.ShortURLDto, error) {
+	for _, shortURL := range r.shortURLs {
+		if shortURL.ShortUID == shortUID {
+			return model.New(shortURL.ShortUID, shortURL.OriginalURL), nil
+		}
 	}
-	defer jsonFile.Close()
-	json.NewEncoder(jsonFile).Encode(r.shortURLs)
-	return nil
-}
-
-func loadFromFile(fileStoragePath string) ([]model.ShortURLSafeDto, error) {
-	shortURLs := make([]model.ShortURLSafeDto, 0)
-	jsonFile, err := os.Open(fileStoragePath)
-	if err != nil {
-		return nil, err
-	}
-	defer jsonFile.Close()
-	json.NewDecoder(jsonFile).Decode(&shortURLs)
-	return shortURLs, nil
+	return model.ShortURLDto{}, fmt.Errorf("short url %s not found", shortUID)
 }

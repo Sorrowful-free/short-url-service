@@ -29,7 +29,10 @@ func run() error {
 	}
 	e.Use(middlewares.LoggerAsMiddleware(l))
 	e.Use(middlewares.GzipMiddleware(l))
-	s := service.NewSimpleService(lc.UIDLength, lc.FileStoragePath, l)
+	s, err := service.NewSimpleService(lc.UIDLength, lc.FileStoragePath, l)
+	if err != nil {
+		return err
+	}
 	handler.NewHandlers(e, s, lc.BaseURL).RegisterHandlers()
 	return e.Start(lc.ListenAddr)
 }

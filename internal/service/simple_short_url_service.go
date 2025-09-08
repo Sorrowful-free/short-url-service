@@ -10,22 +10,22 @@ import (
 )
 
 type SimpleShortURLService struct {
-	shortUIDs          map[string]model.ShortURLDto
 	uidLength          int
 	logger             logger.Logger
 	ShortURLRepository repository.ShortURLRepository
 }
 
-func NewSimpleService(uidLength int, fileStoragePath string, logger logger.Logger) *SimpleShortURLService {
-	shortURLRepository := repository.NewSimpleShortURLRepository(fileStoragePath)
+func NewSimpleService(uidLength int, fileStoragePath string, logger logger.Logger) (ShortURLService, error) {
+	shortURLRepository, err := repository.NewSimpleShortURLRepository(fileStoragePath)
+	if err != nil {
+		return nil, err
+	}
 	service := SimpleShortURLService{
-		shortUIDs:          make(map[string]model.ShortURLDto),
 		uidLength:          uidLength,
 		logger:             logger,
 		ShortURLRepository: shortURLRepository,
 	}
-	service.restoreShortURLsFromRepository()
-	return &service
+	return &service, nil
 }
 
 func (service SimpleShortURLService) TryMakeShort(originalURL string) (string, error) {
@@ -47,7 +47,10 @@ func (service SimpleShortURLService) TryMakeShort(originalURL string) (string, e
 	service.shortUIDs[shortUID] = dto
 	service.logger.Info("short url created", "shortUID", shortUID, "originalURL", originalURL)
 
-	service.ShortURLRepository.Save(dto)
+	err = service.ShortURLRepository.Save(dto)
+	if err != nil {
+		return "", fmt.Errorf("failed to save short url: %w", err)
+	}
 
 	return shortUID, nil
 }
@@ -72,16 +75,4 @@ func makeSimpleUIDString(uidLength int) (string, error) {
 	}
 
 	return fmt.Sprintf("%X", b), nil
-}
-
-func (service SimpleShortURLService) restoreShortURLsFromRepository() error {
-	shortURLs, err := service.ShortURLRepository.Load()
-	if err != nil {
-		return err
-	}
-	service.shortUIDs = make(map[string]model.ShortURLDto)
-	for _, shortSafeURL := range shortURLs {
-		service.shortUIDs[shortSafeURL.ShortUID] = model.New(shortSafeURL.ShortUID, shortSafeURL.OriginalURL)
-	}
-	return nil
 }

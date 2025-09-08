@@ -14,13 +14,16 @@ func TestSimpleShortURLService(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	service := NewSimpleService(consts.TestUIDLength, consts.TestFileStoragePath, l)
+	service, err := NewSimpleService(consts.TestUIDLength, consts.TestFileStoragePath, l)
+	if err != nil {
+		t.Fatal(err)
+	}
 	originalURL := consts.TestOriginalURL
 	shortUID := consts.TestShortUID
 
 	t.Run("constructor for fake service", func(t *testing.T) {
 
-		assert.NotNil(t, service.shortUIDs, "inner map for short urls must be not nil")
+		assert.NotNil(t, service, "service must be not nil")
 	})
 
 	t.Run("generation of fake uid", func(t *testing.T) {
