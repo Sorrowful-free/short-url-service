@@ -35,7 +35,7 @@ func (service SimpleShortURLService) TryMakeShort(originalURL string) (string, e
 
 	for exist := true; exist; { //trying regenerate guid if it wal allready registered
 		shortUID, err = makeSimpleUIDString(service.uidLength)
-		_, exist = service.shortUIDs[shortUID]
+		exist = service.ShortURLRepository.ContainsUID(shortUID)
 
 		if err != nil {
 			return "", fmt.Errorf("failed to make uid: %w", err)
@@ -44,7 +44,7 @@ func (service SimpleShortURLService) TryMakeShort(originalURL string) (string, e
 
 	dto := model.New(shortUID, originalURL)
 
-	service.shortUIDs[shortUID] = dto
+	service.ShortURLRepository.Save(dto)
 	service.logger.Info("short url created", "shortUID", shortUID, "originalURL", originalURL)
 
 	err = service.ShortURLRepository.Save(dto)
@@ -56,10 +56,10 @@ func (service SimpleShortURLService) TryMakeShort(originalURL string) (string, e
 }
 
 func (service SimpleShortURLService) TryMakeOriginal(shortUID string) (string, error) {
-	dto, exist := service.shortUIDs[shortUID]
+	dto, err := service.ShortURLRepository.GetByUID(shortUID)
 
-	if !exist {
-		return "", fmt.Errorf("short url %s doesnot exist ", shortUID)
+	if err != nil {
+		return "", fmt.Errorf("short url %s doesnot exist: %w", shortUID, err)
 	}
 
 	service.logger.Info("original url found", "shortUID", shortUID, "originalURL", dto.OriginalURL)
