@@ -10,7 +10,7 @@ import (
 
 func TestSimpleShortURLService(t *testing.T) {
 
-	l, err := logger.NewLogger()
+	l, err := logger.NewZapLogger()
 	if err != nil {
 		t.Fatal(err)
 	}

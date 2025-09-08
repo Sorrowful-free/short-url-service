@@ -17,7 +17,7 @@ import (
 func TestMakeOriginalHandler(t *testing.T) {
 	t.Run("positive case make original URL", func(t *testing.T) {
 		e := echo.New()
-		l, err := logger.NewLogger()
+		l, err := logger.NewZapLogger()
 		if err != nil {
 			t.Fatal(err)
 		}

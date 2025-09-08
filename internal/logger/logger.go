@@ -4,28 +4,34 @@ import (
 	"go.uber.org/zap"
 )
 
-type Logger struct {
+type Logger interface {
+	Info(message string, args ...interface{})
+	Error(message string, args ...interface{})
+	Debug(message string, args ...interface{})
+}
+
+type ZapLogger struct {
 	sugaredLogger *zap.SugaredLogger
 }
 
-func NewLogger() (*Logger, error) {
+func NewZapLogger() (Logger, error) {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		return nil, err
 	}
-	return &Logger{
+	return &ZapLogger{
 		sugaredLogger: logger.Sugar(),
 	}, nil
 }
 
-func (l *Logger) Info(message string, args ...interface{}) {
+func (l *ZapLogger) Info(message string, args ...interface{}) {
 	l.sugaredLogger.Infow(message, args...)
 }
 
-func (l *Logger) Error(message string, args ...interface{}) {
+func (l *ZapLogger) Error(message string, args ...interface{}) {
 	l.sugaredLogger.Errorw(message, args...)
 }
 
-func (l *Logger) Debug(message string, args ...interface{}) {
+func (l *ZapLogger) Debug(message string, args ...interface{}) {
 	l.sugaredLogger.Debugw(message, args...)
 }

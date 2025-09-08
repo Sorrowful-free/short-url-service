@@ -12,11 +12,11 @@ import (
 type SimpleShortURLService struct {
 	shortUIDs          map[string]model.ShortURLDto
 	uidLength          int
-	logger             *logger.Logger
+	logger             logger.Logger
 	ShortURLRepository repository.ShortURLRepository
 }
 
-func NewSimpleService(uidLength int, fileStoragePath string, logger *logger.Logger) *SimpleShortURLService {
+func NewSimpleService(uidLength int, fileStoragePath string, logger logger.Logger) *SimpleShortURLService {
 	shortURLRepository := repository.NewSimpleShortURLRepository(fileStoragePath)
 	service := SimpleShortURLService{
 		shortUIDs:          make(map[string]model.ShortURLDto),

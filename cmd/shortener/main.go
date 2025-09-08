@@ -23,7 +23,7 @@ func run() error {
 	lc := config.GetLocalConfig()
 
 	e := echo.New()
-	l, err := logger.NewLogger()
+	l, err := logger.NewZapLogger()
 	if err != nil {
 		return err
 	}
