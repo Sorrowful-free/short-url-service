@@ -5,6 +5,8 @@ import (
 
 	"github.com/Sorrowful-free/short-url-service/internal/config"
 	"github.com/Sorrowful-free/short-url-service/internal/handler"
+	"github.com/Sorrowful-free/short-url-service/internal/logger"
+	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
 	"github.com/labstack/echo/v4"
 )
@@ -18,9 +20,19 @@ func main() {
 }
 
 func run() error {
-	localConfig := config.GetLocalConfig()
+	lc := config.GetLocalConfig()
 
 	e := echo.New()
-	handler.NewHandlers(e, service.NewSimpleService(localConfig.UIDLength), localConfig.BaseURL).RegisterHandlers()
-	return e.Start(localConfig.ListenAddr)
+	l, err := logger.NewZapLogger()
+	if err != nil {
+		return err
+	}
+	e.Use(middlewares.LoggerAsMiddleware(l))
+	e.Use(middlewares.GzipMiddleware(l))
+	s, err := service.NewSimpleService(lc.UIDLength, lc.FileStoragePath, l)
+	if err != nil {
+		return err
+	}
+	handler.NewHandlers(e, s, lc.BaseURL).RegisterHandlers()
+	return e.Start(lc.ListenAddr)
 }

@@ -3,23 +3,32 @@ package service
 import (
 	"testing"
 
+	"github.com/Sorrowful-free/short-url-service/internal/consts"
+	"github.com/Sorrowful-free/short-url-service/internal/logger"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFakeService(t *testing.T) {
+func TestSimpleShortURLService(t *testing.T) {
 
-	service := NewSimpleService(8)
-	originalURL := "http://google.com"
-	shortUID := "1234567890"
+	l, err := logger.NewZapLogger()
+	if err != nil {
+		t.Fatal(err)
+	}
+	service, err := NewSimpleService(consts.TestUIDLength, consts.TestFileStoragePath, l)
+	if err != nil {
+		t.Fatal(err)
+	}
+	originalURL := consts.TestOriginalURL
+	shortUID := consts.TestShortUID
 
 	t.Run("constructor for fake service", func(t *testing.T) {
 
-		assert.NotNil(t, service.shortUIDs, "inner map for short urls must be not nil")
+		assert.NotNil(t, service, "service must be not nil")
 	})
 
 	t.Run("generation of fake uid", func(t *testing.T) {
 
-		uid, err := makeSimpleUIDString(8)
+		uid, err := makeSimpleUIDString(consts.TestUIDLength)
 		assert.NotEmpty(t, uid, "generation of uid must generate some string")
 		assert.NoError(t, err, "generation of uid must complete without any error")
 	})

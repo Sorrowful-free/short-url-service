@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 
+	"github.com/Sorrowful-free/short-url-service/internal/consts"
 	"github.com/labstack/echo/v4"
 )
 
@@ -25,10 +25,9 @@ func RegisterMakeShortHandler(h *Handlers) {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
-		c.Response().Header().Set(HeaderContentType, HeaderContentTypeText)
+		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeText)
 		c.Response().WriteHeader(http.StatusCreated)
 
-		fmt.Printf("process request for original URL:%s, with result:%s\n", originalURL, shortURL)
 		return c.String(http.StatusCreated, shortURL)
 	})
 }
