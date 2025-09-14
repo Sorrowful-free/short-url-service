@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func RegisterMakeShortHandler(h *Handlers) {
+func (h *Handlers) RegisterMakeShortHandler() {
 	h.internalEcho.POST(MakeShortPath, func(c echo.Context) error {
 		originalURL, err := io.ReadAll(c.Request().Body)
 		if err != nil {

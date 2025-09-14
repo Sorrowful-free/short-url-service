@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func RegisterMakeOriginalHandler(h *Handlers) {
+func (h *Handlers) RegisterMakeOriginalHandler() {
 	h.internalEcho.GET(MakeOriginalPath, func(c echo.Context) error {
 		shortUID := c.Param(OriginalPathParam)
 		originalURL, err := h.internalURLService.TryMakeOriginal(shortUID)

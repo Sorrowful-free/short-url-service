@@ -10,25 +10,29 @@ const (
 	MakeShortJSONPath = "/api/shorten"
 	MakeOriginalPath  = "/:id"
 	OriginalPathParam = "id"
+	PingDBPath        = "/ping"
 )
 
 type Handlers struct {
 	internalEcho       *echo.Echo
 	internalURLService service.ShortURLService
+	internalDBService  service.DBService
 	internalBaseURL    string
 }
 
-func NewHandlers(echo *echo.Echo, urlService service.ShortURLService, baseURL string) *Handlers {
+func NewHandlers(echo *echo.Echo, urlService service.ShortURLService, dbService service.DBService, baseURL string) *Handlers {
 	return &Handlers{
 		internalEcho:       echo,
 		internalURLService: urlService,
+		internalDBService:  dbService,
 		internalBaseURL:    baseURL,
 	}
 }
 
 func (h *Handlers) RegisterHandlers() *Handlers {
-	RegisterMakeShortHandler(h)
-	RegisterMakeOriginalHandler(h)
-	RegisterMakeShortJSONHandler(h)
+	h.RegisterMakeShortHandler()
+	h.RegisterMakeOriginalHandler()
+	h.RegisterMakeShortJSONHandler()
+	h.RegisterPingDBHandler()
 	return h
 }

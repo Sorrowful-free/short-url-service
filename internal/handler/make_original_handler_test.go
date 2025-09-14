@@ -21,11 +21,15 @@ func TestMakeOriginalHandler(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		service, err := service.NewSimpleService(consts.TestUIDLength, consts.TestFileStoragePath, l)
+		urlService, err := service.NewSimpleService(consts.TestUIDLength, consts.TestFileStoragePath, l)
 		if err != nil {
 			t.Fatal(err)
 		}
-		NewHandlers(e, service, consts.TestBaseURL).RegisterHandlers()
+		dbService, err := service.NewPostgresDBService(consts.TestDatabaseDSN)
+		if err != nil {
+			t.Fatal(err)
+		}
+		NewHandlers(e, urlService, dbService, consts.TestBaseURL).RegisterHandlers()
 
 		originalURL := consts.TestOriginalURL
 		req := httptest.NewRequest(http.MethodPost, MakeShortPath, bytes.NewBufferString(originalURL))

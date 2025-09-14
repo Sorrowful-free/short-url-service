@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func RegisterMakeShortJSONHandler(h *Handlers) {
+func (h *Handlers) RegisterMakeShortJSONHandler() {
 	h.internalEcho.POST(MakeShortJSONPath, func(c echo.Context) error {
 
 		var shortRequest model.ShortRequest

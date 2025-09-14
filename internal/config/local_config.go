@@ -12,6 +12,7 @@ type LocalConfig struct {
 	BaseURL         string
 	UIDLength       int
 	FileStoragePath string
+	DatabaseDSN     string
 }
 
 var localConfig *LocalConfig
@@ -29,6 +30,7 @@ func GetLocalConfig() *LocalConfig {
 	flag.StringVar(&localConfig.BaseURL, "b", "http://localhost:8080", "base URL")
 	flag.IntVar(&localConfig.UIDLength, "l", 8, "length of the short URL")
 	flag.StringVar(&localConfig.FileStoragePath, "f", "tmp_short_urls.json", "file storage path")
+	flag.StringVar(&localConfig.DatabaseDSN, "d", "postgres://postgres:postgres@postgres:5432/short_urls?sslmode=disable", "postgres DSN")
 	flag.Parse()
 
 	//override default values with values from environment variables if they are set
@@ -54,6 +56,11 @@ func GetLocalConfig() *LocalConfig {
 	fileStoragePath := os.Getenv("FILE_STORAGE_PATH")
 	if fileStoragePath != "" {
 		localConfig.FileStoragePath = fileStoragePath
+	}
+
+	databaseDSN := os.Getenv("DATABASE_DSN")
+	if databaseDSN != "" {
+		localConfig.DatabaseDSN = databaseDSN
 	}
 
 	return localConfig

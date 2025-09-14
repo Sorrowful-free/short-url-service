@@ -33,6 +33,11 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	handler.NewHandlers(e, s, lc.BaseURL).RegisterHandlers()
+
+	dbService, err := service.NewPostgresDBService(lc.DatabaseDSN)
+	if err != nil {
+		return err
+	}
+	handler.NewHandlers(e, s, dbService, lc.BaseURL).RegisterHandlers()
 	return e.Start(lc.ListenAddr)
 }
