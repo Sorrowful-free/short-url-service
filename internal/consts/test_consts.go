@@ -8,6 +8,6 @@ const (
 	TestOriginalURL         = "http://example.com"
 	TestShortURL            = "http://localhost:8080/1234567890"
 	TestShortUID            = "1234567890"
-	TestDatabaseDSN         = "postgres://postgres:postgres@postgres:5432/short_urls?sslmode=disable"
-	TestInvalideDatabaseDSN = "postgres://postgres:postgres@postgres:4325/short_urls?sslmode=disable"
+	TestDatabaseDSN         = "postgresql://postgres:postgres@localhost:5432?sslmode=disable"
+	TestInvalideDatabaseDSN = "postgresql://postgres:postgres@postgres:4325/short_urls?sslmode=disable"
 )
