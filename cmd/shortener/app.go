@@ -1,15 +1,19 @@
 package main
 
 import (
+	"context"
+
 	"github.com/Sorrowful-free/short-url-service/internal/config"
 	"github.com/Sorrowful-free/short-url-service/internal/handler"
 	"github.com/Sorrowful-free/short-url-service/internal/logger"
 	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
+	"github.com/golang-migrate/migrate"
 	"github.com/labstack/echo/v4"
 )
 
 type App struct {
+	internalContext    context.Context
 	internalConfig     *config.LocalConfig
 	internalLogger     logger.Logger
 	internalEcho       *echo.Echo
@@ -17,8 +21,10 @@ type App struct {
 	internalDBService  service.DBService
 }
 
-func NewApp() *App {
-	return &App{}
+func NewApp(ctx context.Context) *App {
+	return &App{
+		internalContext: ctx,
+	}
 }
 
 func (a *App) InitLogger() error {
@@ -35,12 +41,15 @@ func (a *App) InitConfig() error {
 	return nil
 }
 
-func (a *App) InitURLService() error {
-	urlService, err := service.NewSimpleService(a.internalConfig.UIDLength, a.internalConfig.FileStoragePath, a.internalLogger)
+func (a *App) InitMigration() error {
+	m, err := migrate.New("file:///migrations", a.internalConfig.DatabaseDSN)
 	if err != nil {
 		return err
 	}
-	a.internalURLService = urlService
+	err = m.Up()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -50,6 +59,15 @@ func (a *App) InitDBService() error {
 		return err
 	}
 	a.internalDBService = dbService
+	return nil
+}
+
+func (a *App) InitURLService() error {
+	urlService, err := service.NewSimpleService(a.internalConfig.UIDLength, a.internalConfig.FileStoragePath, a.internalLogger)
+	if err != nil {
+		return err
+	}
+	a.internalURLService = urlService
 	return nil
 }
 
@@ -70,10 +88,13 @@ func (a *App) Init() error {
 	if err := a.InitConfig(); err != nil {
 		return err
 	}
-	if err := a.InitURLService(); err != nil {
+	if err := a.InitMigration(); err != nil {
 		return err
 	}
 	if err := a.InitDBService(); err != nil {
+		return err
+	}
+	if err := a.InitURLService(); err != nil {
 		return err
 	}
 	if err := a.InitHandlers(); err != nil {

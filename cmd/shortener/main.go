@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 )
 
 func main() {
 
-	app := NewApp()
+	app := NewApp(context.Background())
 	if err := app.Init(); err != nil {
 		log.Fatal(err)
 	}

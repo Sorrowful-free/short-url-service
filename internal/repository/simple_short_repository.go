@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Sorrowful-free/short-url-service/internal/model"
@@ -23,13 +24,19 @@ func NewSimpleShortURLRepository(fileStoragePath string) (ShortURLRepository, er
 	}, nil
 }
 
-func (r *SimpleShortURLRepository) Save(shortURL model.ShortURLDto) error {
+func (r *SimpleShortURLRepository) Save(ctx context.Context, shortURL model.ShortURLDto) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
 	r.shortURLs = append(r.shortURLs, model.NewShortURLSafeDto(shortURL))
 	r.fileStorage.SafeAll(r.shortURLs)
 	return nil
 }
 
-func (r *SimpleShortURLRepository) ContainsUID(shortUID string) bool {
+func (r *SimpleShortURLRepository) ContainsUID(ctx context.Context, shortUID string) bool {
+	if ctx.Err() != nil {
+		return false
+	}
 	for _, shortURL := range r.shortURLs {
 		if shortURL.ShortUID == shortUID {
 			return true
@@ -38,7 +45,10 @@ func (r *SimpleShortURLRepository) ContainsUID(shortUID string) bool {
 	return false
 }
 
-func (r *SimpleShortURLRepository) GetByUID(shortUID string) (model.ShortURLDto, error) {
+func (r *SimpleShortURLRepository) GetByUID(ctx context.Context, shortUID string) (model.ShortURLDto, error) {
+	if ctx.Err() != nil {
+		return model.ShortURLDto{}, ctx.Err()
+	}
 	for _, shortURL := range r.shortURLs {
 		if shortURL.ShortUID == shortUID {
 			return model.New(shortURL.ShortUID, shortURL.OriginalURL), nil

@@ -1,6 +1,8 @@
 package service
 
+import "context"
+
 type ShortURLService interface {
-	TryMakeShort(originalURL string) (string, error)
-	TryMakeOriginal(shortURL string) (string, error)
+	TryMakeShort(ctx context.Context, originalURL string) (string, error)
+	TryMakeOriginal(ctx context.Context, shortURL string) (string, error)
 }

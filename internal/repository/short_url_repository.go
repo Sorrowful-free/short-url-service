@@ -1,9 +1,13 @@
 package repository
 
-import "github.com/Sorrowful-free/short-url-service/internal/model"
+import (
+	"context"
+
+	"github.com/Sorrowful-free/short-url-service/internal/model"
+)
 
 type ShortURLRepository interface {
-	Save(shortURL model.ShortURLDto) error
-	ContainsUID(shortUID string) bool
-	GetByUID(shortUID string) (model.ShortURLDto, error)
+	Save(ctx context.Context, shortURL model.ShortURLDto) error
+	ContainsUID(ctx context.Context, shortUID string) bool
+	GetByUID(ctx context.Context, shortUID string) (model.ShortURLDto, error)
 }

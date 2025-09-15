@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"crypto/rand"
 	"fmt"
 
@@ -28,14 +29,14 @@ func NewSimpleService(uidLength int, fileStoragePath string, logger logger.Logge
 	return &service, nil
 }
 
-func (service SimpleShortURLService) TryMakeShort(originalURL string) (string, error) {
+func (service SimpleShortURLService) TryMakeShort(ctx context.Context, originalURL string) (string, error) {
 
 	shortUID := ""
 	err := error(nil)
 
 	for exist := true; exist; { //trying regenerate guid if it wal allready registered
 		shortUID, err = makeSimpleUIDString(service.uidLength)
-		exist = service.ShortURLRepository.ContainsUID(shortUID)
+		exist = service.ShortURLRepository.ContainsUID(ctx, shortUID)
 
 		if err != nil {
 			return "", fmt.Errorf("failed to make uid: %w", err)
@@ -44,10 +45,10 @@ func (service SimpleShortURLService) TryMakeShort(originalURL string) (string, e
 
 	dto := model.New(shortUID, originalURL)
 
-	service.ShortURLRepository.Save(dto)
+	service.ShortURLRepository.Save(ctx, dto)
 	service.logger.Info("short url created", "shortUID", shortUID, "originalURL", originalURL)
 
-	err = service.ShortURLRepository.Save(dto)
+	err = service.ShortURLRepository.Save(ctx, dto)
 	if err != nil {
 		return "", fmt.Errorf("failed to save short url: %w", err)
 	}
@@ -55,8 +56,8 @@ func (service SimpleShortURLService) TryMakeShort(originalURL string) (string, e
 	return shortUID, nil
 }
 
-func (service SimpleShortURLService) TryMakeOriginal(shortUID string) (string, error) {
-	dto, err := service.ShortURLRepository.GetByUID(shortUID)
+func (service SimpleShortURLService) TryMakeOriginal(ctx context.Context, shortUID string) (string, error) {
+	dto, err := service.ShortURLRepository.GetByUID(ctx, shortUID)
 
 	if err != nil {
 		return "", fmt.Errorf("short url %s doesnot exist: %w", shortUID, err)
