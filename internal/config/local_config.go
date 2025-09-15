@@ -65,7 +65,7 @@ func GetLocalConfig() *LocalConfig {
 		localConfig.MigrationsPath = migrationsPath
 	}
 
-	databaseDSN := os.Getenv("DATABASE_DSN")
+	databaseDSN := os.Getenv("DATABASE_CONN_STRING")
 	if databaseDSN != "" {
 		localConfig.DatabaseDSN = databaseDSN
 	}
