@@ -6,6 +6,7 @@ import (
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
 	"github.com/Sorrowful-free/short-url-service/internal/logger"
+	"github.com/Sorrowful-free/short-url-service/internal/repository"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +16,12 @@ func TestSimpleShortURLService(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	service, err := NewSimpleService(consts.TestUIDLength, consts.TestFileStoragePath, l)
+
+	shortURLRepository, err := repository.NewSimpleShortURLRepository(consts.TestFileStoragePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	service, err := NewSimpleService(consts.TestUIDLength, shortURLRepository, l)
 	if err != nil {
 		t.Fatal(err)
 	}

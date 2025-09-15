@@ -16,15 +16,13 @@ const (
 type Handlers struct {
 	internalEcho       *echo.Echo
 	internalURLService service.ShortURLService
-	internalDBService  service.DBService
 	internalBaseURL    string
 }
 
-func NewHandlers(echo *echo.Echo, urlService service.ShortURLService, dbService service.DBService, baseURL string) *Handlers {
+func NewHandlers(echo *echo.Echo, urlService service.ShortURLService, baseURL string) *Handlers {
 	return &Handlers{
 		internalEcho:       echo,
 		internalURLService: urlService,
-		internalDBService:  dbService,
 		internalBaseURL:    baseURL,
 	}
 }

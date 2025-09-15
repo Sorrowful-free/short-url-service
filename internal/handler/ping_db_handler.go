@@ -8,7 +8,7 @@ import (
 
 func (h *Handlers) RegisterPingDBHandler() {
 	h.internalEcho.GET("/ping", func(c echo.Context) error {
-		err := h.internalDBService.Ping()
+		err := h.internalURLService.Ping(c.Request().Context())
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}

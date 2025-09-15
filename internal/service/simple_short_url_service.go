@@ -16,11 +16,7 @@ type SimpleShortURLService struct {
 	ShortURLRepository repository.ShortURLRepository
 }
 
-func NewSimpleService(uidLength int, fileStoragePath string, logger logger.Logger) (ShortURLService, error) {
-	shortURLRepository, err := repository.NewSimpleShortURLRepository(fileStoragePath)
-	if err != nil {
-		return nil, err
-	}
+func NewSimpleService(uidLength int, shortURLRepository repository.ShortURLRepository, logger logger.Logger) (ShortURLService, error) {
 	service := SimpleShortURLService{
 		uidLength:          uidLength,
 		logger:             logger,
@@ -66,6 +62,10 @@ func (service SimpleShortURLService) TryMakeOriginal(ctx context.Context, shortU
 	service.logger.Info("original url found", "shortUID", shortUID, "originalURL", dto.OriginalURL)
 
 	return dto.OriginalURL, nil
+}
+
+func (service SimpleShortURLService) Ping(ctx context.Context) error {
+	return service.ShortURLRepository.Ping(ctx)
 }
 
 func makeSimpleUIDString(uidLength int) (string, error) {

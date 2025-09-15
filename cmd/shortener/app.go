@@ -7,18 +7,20 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/handler"
 	"github.com/Sorrowful-free/short-url-service/internal/logger"
 	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
+	"github.com/Sorrowful-free/short-url-service/internal/repository"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
 	"github.com/golang-migrate/migrate"
 	"github.com/labstack/echo/v4"
 )
 
 type App struct {
-	internalContext    context.Context
-	internalConfig     *config.LocalConfig
-	internalLogger     logger.Logger
-	internalEcho       *echo.Echo
-	internalURLService service.ShortURLService
-	internalDBService  service.DBService
+	internalContext context.Context
+	internalConfig  *config.LocalConfig
+	internalLogger  logger.Logger
+	internalEcho    *echo.Echo
+
+	internalURLRepository repository.ShortURLRepository
+	internalURLService    service.ShortURLService
 }
 
 func NewApp(ctx context.Context) *App {
@@ -53,17 +55,17 @@ func (a *App) InitMigration() error {
 	return nil
 }
 
-func (a *App) InitDBService() error {
-	dbService, err := service.NewPostgresDBService(a.internalConfig.DatabaseDSN)
+func (a *App) InitURLRepository() error {
+	urlRepository, err := repository.NewPostgresShortURLRepository(a.internalConfig.DatabaseDSN)
 	if err != nil {
 		return err
 	}
-	a.internalDBService = dbService
+	a.internalURLRepository = urlRepository
 	return nil
 }
 
 func (a *App) InitURLService() error {
-	urlService, err := service.NewSimpleService(a.internalConfig.UIDLength, a.internalConfig.FileStoragePath, a.internalLogger)
+	urlService, err := service.NewSimpleService(a.internalConfig.UIDLength, a.internalURLRepository, a.internalLogger)
 	if err != nil {
 		return err
 	}
@@ -75,7 +77,7 @@ func (a *App) InitHandlers() error {
 	e := echo.New()
 	e.Use(middlewares.LoggerAsMiddleware(a.internalLogger))
 	e.Use(middlewares.GzipMiddleware(a.internalLogger))
-	handlers := handler.NewHandlers(e, a.internalURLService, a.internalDBService, a.internalConfig.BaseURL)
+	handlers := handler.NewHandlers(e, a.internalURLService, a.internalConfig.BaseURL)
 	handlers.RegisterHandlers()
 	a.internalEcho = e
 	return nil
@@ -91,7 +93,7 @@ func (a *App) Init() error {
 	if err := a.InitMigration(); err != nil {
 		return err
 	}
-	if err := a.InitDBService(); err != nil {
+	if err := a.InitURLRepository(); err != nil {
 		return err
 	}
 	if err := a.InitURLService(); err != nil {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/Sorrowful-free/short-url-service/internal/model"
+	_ "github.com/lib/pq"
 )
 
 type PostgresShortURLRepository struct {
@@ -57,4 +58,15 @@ func (r *PostgresShortURLRepository) GetByUID(ctx context.Context, shortUID stri
 		return model.ShortURLDto{}, fmt.Errorf("failed to get short url: %w", err)
 	}
 	return model.ShortURLDto{ShortUID: shortUID, OriginalURL: originalURL}, nil
+}
+
+func (r *PostgresShortURLRepository) Ping(ctx context.Context) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+	err := r.db.PingContext(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to ping database: %w", err)
+	}
+	return nil
 }

@@ -2,17 +2,16 @@ module github.com/Sorrowful-free/short-url-service
 
 go 1.24.5
 
-require github.com/labstack/echo/v4 v4.13.4
-
 require (
-	github.com/golang-migrate/migrate/v4 v4.19.0 // indirect
-	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	go.uber.org/multierr v1.10.0 // indirect
+	github.com/golang/mock v1.6.0
+	github.com/labstack/echo/v4 v4.13.4
 )
+
+require go.uber.org/multierr v1.10.0 // indirect
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/lib/pq v1.10.9

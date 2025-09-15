@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
-	"github.com/Sorrowful-free/short-url-service/internal/logger"
-	"github.com/Sorrowful-free/short-url-service/internal/service"
+	"github.com/Sorrowful-free/short-url-service/mocks"
+	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,20 +17,11 @@ import (
 func TestMakeOriginalHandler(t *testing.T) {
 	t.Run("positive case make original URL", func(t *testing.T) {
 		e := echo.New()
-		l, err := logger.NewZapLogger()
-		if err != nil {
-			t.Fatal(err)
-		}
-		urlService, err := service.NewSimpleService(consts.TestUIDLength, consts.TestFileStoragePath, l)
-		if err != nil {
-			t.Fatal(err)
-		}
-		dbService, err := service.NewPostgresDBService(consts.TestDatabaseDSN)
-		if err != nil {
-			t.Fatal(err)
-		}
-		NewHandlers(e, urlService, dbService, consts.TestBaseURL).RegisterHandlers()
+		ctrl := gomock.NewController(t)
+		urlService := mocks.NewMockShortURLService(ctrl)
+		NewHandlers(e, urlService, consts.TestBaseURL).RegisterHandlers()
 
+		urlService.EXPECT().TryMakeOriginal(gomock.Any(), gomock.Any()).Return(consts.TestOriginalURL, nil)
 		originalURL := consts.TestOriginalURL
 		req := httptest.NewRequest(http.MethodPost, MakeShortPath, bytes.NewBufferString(originalURL))
 		rr := httptest.NewRecorder()

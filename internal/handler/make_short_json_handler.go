@@ -19,7 +19,7 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
-		shortUID, err := h.internalURLService.TryMakeShort(shortRequest.OriginalURL)
+		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), shortRequest.OriginalURL)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}

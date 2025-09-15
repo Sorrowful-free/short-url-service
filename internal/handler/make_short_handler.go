@@ -15,7 +15,7 @@ func (h *Handlers) RegisterMakeShortHandler() {
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
-		shortUID, err := h.internalURLService.TryMakeShort(string(originalURL))
+		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), string(originalURL))
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}

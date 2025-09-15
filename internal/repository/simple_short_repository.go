@@ -56,3 +56,7 @@ func (r *SimpleShortURLRepository) GetByUID(ctx context.Context, shortUID string
 	}
 	return model.ShortURLDto{}, fmt.Errorf("short url %s not found", shortUID)
 }
+
+func (r *SimpleShortURLRepository) Ping(ctx context.Context) error {
+	return nil
+}

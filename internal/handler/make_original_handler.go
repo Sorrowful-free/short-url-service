@@ -10,7 +10,7 @@ import (
 func (h *Handlers) RegisterMakeOriginalHandler() {
 	h.internalEcho.GET(MakeOriginalPath, func(c echo.Context) error {
 		shortUID := c.Param(OriginalPathParam)
-		originalURL, err := h.internalURLService.TryMakeOriginal(shortUID)
+		originalURL, err := h.internalURLService.TryMakeOriginal(c.Request().Context(), shortUID)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
