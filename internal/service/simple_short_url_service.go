@@ -41,7 +41,6 @@ func (service SimpleShortURLService) TryMakeShort(ctx context.Context, originalU
 
 	dto := model.New(shortUID, originalURL)
 
-	service.ShortURLRepository.Save(ctx, dto)
 	service.logger.Info("short url created", "shortUID", shortUID, "originalURL", originalURL)
 
 	err = service.ShortURLRepository.Save(ctx, dto)

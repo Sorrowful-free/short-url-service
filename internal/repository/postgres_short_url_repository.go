@@ -5,7 +5,6 @@ import (
 
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
@@ -18,7 +17,7 @@ func NewPostgresShortURLRepository(databaseDSN string) (ShortURLRepository, erro
 
 	db, err := sql.Open("pgx", databaseDSN)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %w", err)
+		return nil, err
 	}
 
 	return &PostgresShortURLRepository{
@@ -32,7 +31,7 @@ func (r *PostgresShortURLRepository) Save(ctx context.Context, shortURL model.Sh
 	}
 	_, err := r.db.ExecContext(ctx, "INSERT INTO short_urls (short_uid, original_url) VALUES ($1, $2)", shortURL.ShortUID, shortURL.OriginalURL)
 	if err != nil {
-		return fmt.Errorf("failed to save short url: %w", err)
+		return err
 	}
 	return nil
 }
@@ -56,7 +55,7 @@ func (r *PostgresShortURLRepository) GetByUID(ctx context.Context, shortUID stri
 	var originalURL string
 	err := r.db.QueryRowContext(ctx, "SELECT original_url FROM short_urls WHERE short_uid = $1", shortUID).Scan(&originalURL)
 	if err != nil {
-		return model.ShortURLDto{}, fmt.Errorf("failed to get short url: %w", err)
+		return model.ShortURLDto{}, err
 	}
 	return model.ShortURLDto{ShortUID: shortUID, OriginalURL: originalURL}, nil
 }
@@ -67,7 +66,7 @@ func (r *PostgresShortURLRepository) Ping(ctx context.Context) error {
 	}
 	err := r.db.PingContext(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to ping database: %w", err)
+		return err
 	}
 	return nil
 }
