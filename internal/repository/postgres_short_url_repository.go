@@ -1,12 +1,13 @@
 package repository
 
 import (
+	_ "github.com/jackc/pgx/v5/stdlib"
+
 	"context"
 	"database/sql"
 	"fmt"
 
 	"github.com/Sorrowful-free/short-url-service/internal/model"
-	_ "github.com/lib/pq"
 )
 
 type PostgresShortURLRepository struct {
@@ -15,7 +16,7 @@ type PostgresShortURLRepository struct {
 
 func NewPostgresShortURLRepository(databaseDSN string) (ShortURLRepository, error) {
 
-	db, err := sql.Open("postgres", databaseDSN)
+	db, err := sql.Open("pgx", databaseDSN)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}

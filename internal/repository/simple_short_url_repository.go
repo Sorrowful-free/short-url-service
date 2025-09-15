@@ -8,19 +8,12 @@ import (
 )
 
 type SimpleShortURLRepository struct {
-	shortURLs   []model.ShortURLSafeDto
-	fileStorage FileStorage
+	shortURLs []model.ShortURLSafeDto
 }
 
 func NewSimpleShortURLRepository(fileStoragePath string) (ShortURLRepository, error) {
-	fileStorage := NewSimpleFileStorage(fileStoragePath)
-	shortURLs, err := fileStorage.LoadAll()
-	if err != nil {
-		return nil, err
-	}
 	return &SimpleShortURLRepository{
-		shortURLs:   shortURLs,
-		fileStorage: fileStorage,
+		shortURLs: make([]model.ShortURLSafeDto, 0),
 	}, nil
 }
 
@@ -29,7 +22,7 @@ func (r *SimpleShortURLRepository) Save(ctx context.Context, shortURL model.Shor
 		return ctx.Err()
 	}
 	r.shortURLs = append(r.shortURLs, model.NewShortURLSafeDto(shortURL))
-	r.fileStorage.SafeAll(r.shortURLs)
+
 	return nil
 }
 

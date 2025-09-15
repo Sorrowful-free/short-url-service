@@ -1,6 +1,9 @@
 package main
 
 import (
+	_ "github.com/golang-migrate/migrate/database/postgres"
+	_ "github.com/golang-migrate/migrate/source/file"
+
 	"context"
 
 	"github.com/Sorrowful-free/short-url-service/internal/config"
@@ -44,22 +47,34 @@ func (a *App) InitConfig() error {
 }
 
 func (a *App) InitMigration() error {
-	m, err := migrate.New("file:///migrations", a.internalConfig.DatabaseDSN)
+	m, err := migrate.New(a.internalConfig.MigrationsPath, a.internalConfig.DatabaseDSN)
 	if err != nil {
 		return err
 	}
 	err = m.Up()
-	if err != nil {
+	if err != nil && err != migrate.ErrNoChange {
 		return err
 	}
 	return nil
 }
 
 func (a *App) InitURLRepository() error {
-	urlRepository, err := repository.NewPostgresShortURLRepository(a.internalConfig.DatabaseDSN)
+
+	var urlRepository repository.ShortURLRepository
+	var err error
+
+	if a.internalConfig.DatabaseDSN != "" {
+		urlRepository, err = repository.NewPostgresShortURLRepository(a.internalConfig.DatabaseDSN)
+	} else if a.internalConfig.FileStoragePath != "" {
+		urlRepository, err = repository.NewFileStorageShortURLRepository(a.internalConfig.FileStoragePath)
+	} else {
+		urlRepository, err = repository.NewSimpleShortURLRepository(a.internalConfig.FileStoragePath)
+	}
+
 	if err != nil {
 		return err
 	}
+
 	a.internalURLRepository = urlRepository
 	return nil
 }
