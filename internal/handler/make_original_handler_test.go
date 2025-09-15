@@ -21,6 +21,7 @@ func TestMakeOriginalHandler(t *testing.T) {
 		urlService := mocks.NewMockShortURLService(ctrl)
 		NewHandlers(e, urlService, consts.TestBaseURL).RegisterHandlers()
 
+		urlService.EXPECT().TryMakeShort(gomock.Any(), gomock.Any()).Return(consts.TestShortURL, nil)
 		urlService.EXPECT().TryMakeOriginal(gomock.Any(), gomock.Any()).Return(consts.TestOriginalURL, nil)
 		originalURL := consts.TestOriginalURL
 		req := httptest.NewRequest(http.MethodPost, MakeShortPath, bytes.NewBufferString(originalURL))
