@@ -14,10 +14,8 @@ import (
 func TestPingDBHandler(t *testing.T) {
 	t.Run("positive case ping database", func(t *testing.T) {
 		e := echo.New()
-		dbService, err := service.NewPostgresDBService(consts.TestDatabaseDSN)
-		if err != nil {
-			t.Fatal(err)
-		}
+		dbService := service.NewMockDBService(false)
+
 		NewHandlers(e, nil, dbService, consts.TestBaseURL).RegisterHandlers()
 
 		req := httptest.NewRequest(http.MethodGet, PingDBPath, nil)
@@ -32,10 +30,8 @@ func TestPingDBHandler(t *testing.T) {
 
 	t.Run("negative case ping database", func(t *testing.T) {
 		e := echo.New()
-		dbService, err := service.NewPostgresDBService(consts.TestInvalideDatabaseDSN)
-		if err != nil {
-			t.Fatal(err)
-		}
+		dbService := service.NewMockDBService(true)
+
 		NewHandlers(e, nil, dbService, consts.TestBaseURL).RegisterHandlers()
 
 		req := httptest.NewRequest(http.MethodGet, PingDBPath, nil)
