@@ -53,8 +53,11 @@ func (r *PostgresShortURLRepository) GetByUID(ctx context.Context, shortUID stri
 		return model.ShortURLDto{}, ctx.Err()
 	}
 	var originalURL string
-	err := r.db.QueryRowContext(ctx, "SELECT original_url FROM short_urls WHERE short_uid = $1", shortUID).Scan(&originalURL)
-	if err != nil {
+	row := r.db.QueryRowContext(ctx, "SELECT original_url FROM short_urls WHERE short_uid = $1", shortUID)
+	if row.Err() != nil {
+		return model.ShortURLDto{}, row.Err()
+	}
+	if err := row.Scan(&originalURL); err != nil {
 		return model.ShortURLDto{}, err
 	}
 	return model.ShortURLDto{ShortUID: shortUID, OriginalURL: originalURL}, nil
