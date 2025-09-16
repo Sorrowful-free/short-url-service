@@ -47,6 +47,11 @@ func (a *App) InitConfig() error {
 }
 
 func (a *App) InitMigration() error {
+
+	//if database DSN is not set, we don't need to run migrations
+	if !a.internalConfig.HasDatabaseDSN() {
+		return nil
+	}
 	m, err := migrate.New(a.internalConfig.MigrationsPath, a.internalConfig.DatabaseDSN)
 	if err != nil {
 		return err
@@ -63,9 +68,9 @@ func (a *App) InitURLRepository() error {
 	var urlRepository repository.ShortURLRepository
 	var err error
 
-	if a.internalConfig.DatabaseDSN != "" {
+	if a.internalConfig.HasDatabaseDSN() {
 		urlRepository, err = repository.NewPostgresShortURLRepository(a.internalConfig.DatabaseDSN)
-	} else if a.internalConfig.FileStoragePath != "" {
+	} else if a.internalConfig.HasFileStoragePath() {
 		urlRepository, err = repository.NewFileStorageShortURLRepository(a.internalConfig.FileStoragePath)
 	} else {
 		urlRepository, err = repository.NewSimpleShortURLRepository(a.internalConfig.FileStoragePath)

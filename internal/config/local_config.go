@@ -72,3 +72,11 @@ func GetLocalConfig() *LocalConfig {
 
 	return localConfig
 }
+
+func (c *LocalConfig) HasFileStoragePath() bool {
+	return c.FileStoragePath != ""
+}
+
+func (c *LocalConfig) HasDatabaseDSN() bool {
+	return c.DatabaseDSN != ""
+}
