@@ -27,16 +27,9 @@ func NewSimpleService(uidLength int, shortURLRepository repository.ShortURLRepos
 
 func (service SimpleShortURLService) TryMakeShort(ctx context.Context, originalURL string) (string, error) {
 
-	shortUID := ""
-	err := error(nil)
-
-	for exist := true; exist; { //trying regenerate guid if it wal allready registered
-		shortUID, err = makeSimpleUIDString(service.uidLength)
-		exist = service.ShortURLRepository.ContainsUID(ctx, shortUID)
-
-		if err != nil {
-			return "", fmt.Errorf("failed to make uid: %w", err)
-		}
+	shortUID, err := service.makeSimpleUUIDString(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to make uid: %w", err)
 	}
 
 	dto := model.New(shortUID, originalURL)
@@ -67,12 +60,12 @@ func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, orig
 	shortURLs := make([]model.ShortURLDto, len(originalURLs))
 	shortUIDs := make([]string, len(originalURLs))
 	for i, originalURL := range originalURLs {
-		shortURL, err := service.TryMakeShort(ctx, originalURL)
+		shortUID, err := service.makeSimpleUUIDString(ctx)
 		if err != nil {
 			return nil, err
 		}
-		shortURLs[i] = model.New(shortURL, originalURL)
-		shortUIDs[i] = shortURL
+		shortURLs[i] = model.New(shortUID, originalURL)
+		shortUIDs[i] = shortUID
 	}
 
 	err := service.ShortURLRepository.SaveBatch(ctx, shortURLs)
@@ -95,4 +88,20 @@ func makeSimpleUIDString(uidLength int) (string, error) {
 	}
 
 	return fmt.Sprintf("%X", b), nil
+}
+
+func (service SimpleShortURLService) makeSimpleUUIDString(ctx context.Context) (string, error) {
+	shortUID := ""
+	err := error(nil)
+
+	for exist := true; exist; { //trying regenerate guid if it wal allready registered
+		shortUID, err = makeSimpleUIDString(service.uidLength)
+		exist = service.ShortURLRepository.ContainsUID(ctx, shortUID)
+
+		if err != nil {
+			return "", fmt.Errorf("failed to make uid: %w", err)
+		}
+	}
+
+	return shortUID, nil
 }
