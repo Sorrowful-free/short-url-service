@@ -26,6 +26,15 @@ func (r *SimpleShortURLRepository) Save(ctx context.Context, shortURL model.Shor
 	return nil
 }
 
+func (r *SimpleShortURLRepository) SaveBatch(ctx context.Context, shortURLs []model.ShortURLDto) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+	for _, shortURL := range shortURLs {
+		r.shortURLs = append(r.shortURLs, model.NewShortURLSafeDto(shortURL))
+	}
+	return nil
+}
 func (r *SimpleShortURLRepository) ContainsUID(ctx context.Context, shortUID string) bool {
 	if ctx.Err() != nil {
 		return false

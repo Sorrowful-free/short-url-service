@@ -33,6 +33,17 @@ func (r *FileStorageShortURLRepository) Save(ctx context.Context, shortURL model
 	return nil
 }
 
+func (r *FileStorageShortURLRepository) SaveBatch(ctx context.Context, shortURLs []model.ShortURLDto) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+	for _, shortURL := range shortURLs {
+		r.shortURLs = append(r.shortURLs, model.NewShortURLSafeDto(shortURL))
+	}
+	r.fileStorage.SafeAll(r.shortURLs)
+	return nil
+}
+
 func (r *FileStorageShortURLRepository) ContainsUID(ctx context.Context, shortUID string) bool {
 	if ctx.Err() != nil {
 		return false

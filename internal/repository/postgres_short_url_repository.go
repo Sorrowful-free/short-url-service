@@ -36,6 +36,38 @@ func (r *PostgresShortURLRepository) Save(ctx context.Context, shortURL model.Sh
 	return nil
 }
 
+func (r *PostgresShortURLRepository) SaveBatch(ctx context.Context, shortURLs []model.ShortURLDto) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	stmt, err := tx.PrepareContext(ctx, "INSERT INTO short_urls (short_uid, original_url) VALUES ($1, $2)")
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+
+	for _, shortURL := range shortURLs {
+		_, err := stmt.ExecContext(ctx, shortURL.ShortUID, shortURL.OriginalURL)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *PostgresShortURLRepository) ContainsUID(ctx context.Context, shortUID string) bool {
 	if ctx.Err() != nil {
 		return false

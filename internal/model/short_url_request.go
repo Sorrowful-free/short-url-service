@@ -1,5 +1,5 @@
 package model
 
-type ShortRequest struct {
+type ShortURLRequest struct {
 	OriginalURL string `json:"url"`
 }

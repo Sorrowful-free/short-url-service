@@ -91,3 +91,17 @@ func (mr *MockShortURLRepositoryMockRecorder) Save(ctx, shortURL interface{}) *g
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockShortURLRepository)(nil).Save), ctx, shortURL)
 }
+
+// SaveBatch mocks base method.
+func (m *MockShortURLRepository) SaveBatch(ctx context.Context, shortURLs []model.ShortURLDto) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveBatch", ctx, shortURLs)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveBatch indicates an expected call of SaveBatch.
+func (mr *MockShortURLRepositoryMockRecorder) SaveBatch(ctx, shortURLs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveBatch", reflect.TypeOf((*MockShortURLRepository)(nil).SaveBatch), ctx, shortURLs)
+}

@@ -13,7 +13,7 @@ import (
 func (h *Handlers) RegisterMakeShortJSONHandler() {
 	h.internalEcho.POST(MakeShortJSONPath, func(c echo.Context) error {
 
-		var shortRequest model.ShortRequest
+		var shortRequest model.ShortURLRequest
 		dec := json.NewDecoder(c.Request().Body)
 		err := dec.Decode(&shortRequest)
 		if err != nil {
@@ -32,7 +32,7 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeJSON)
 		c.Response().WriteHeader(http.StatusCreated)
 
-		shortResponse := model.ShortResponse{
+		shortResponse := model.ShortURLResponse{
 			ShortURL: shortURL,
 		}
 

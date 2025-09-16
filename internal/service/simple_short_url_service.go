@@ -63,6 +63,26 @@ func (service SimpleShortURLService) TryMakeOriginal(ctx context.Context, shortU
 	return dto.OriginalURL, nil
 }
 
+func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, originalURLs []string) ([]string, error) {
+	shortURLs := make([]model.ShortURLDto, len(originalURLs))
+	shortUIDs := make([]string, len(originalURLs))
+	for i, originalURL := range originalURLs {
+		shortURL, err := service.TryMakeShort(ctx, originalURL)
+		if err != nil {
+			return nil, err
+		}
+		shortURLs[i] = model.New(shortURL, originalURL)
+		shortUIDs[i] = shortURL
+	}
+
+	err := service.ShortURLRepository.SaveBatch(ctx, shortURLs)
+	if err != nil {
+		return nil, err
+	}
+
+	return shortUIDs, nil
+}
+
 func (service SimpleShortURLService) Ping(ctx context.Context) error {
 	return service.ShortURLRepository.Ping(ctx)
 }

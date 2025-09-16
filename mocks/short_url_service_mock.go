@@ -77,3 +77,18 @@ func (mr *MockShortURLServiceMockRecorder) TryMakeShort(ctx, originalURL interfa
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TryMakeShort", reflect.TypeOf((*MockShortURLService)(nil).TryMakeShort), ctx, originalURL)
 }
+
+// TryMakeShortBatch mocks base method.
+func (m *MockShortURLService) TryMakeShortBatch(ctx context.Context, originalURLs []string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TryMakeShortBatch", ctx, originalURLs)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TryMakeShortBatch indicates an expected call of TryMakeShortBatch.
+func (mr *MockShortURLServiceMockRecorder) TryMakeShortBatch(ctx, originalURLs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TryMakeShortBatch", reflect.TypeOf((*MockShortURLService)(nil).TryMakeShortBatch), ctx, originalURLs)
+}

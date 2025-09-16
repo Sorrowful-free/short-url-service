@@ -16,22 +16,30 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMakeShortJSONHandler(t *testing.T) {
-	t.Run("positive case create short URL", func(t *testing.T) {
+func TestMakeShortBatchJSONHandler(t *testing.T) {
+	t.Run("positive case create short URL batch", func(t *testing.T) {
 		e := echo.New()
 		ctrl := gomock.NewController(t)
 		urlService := mocks.NewMockShortURLService(ctrl)
 
 		NewHandlers(e, urlService, consts.TestBaseURL).RegisterHandlers()
 
-		urlService.EXPECT().TryMakeShort(gomock.Any(), gomock.Any()).Return(consts.TestShortURL, nil)
+		urlService.EXPECT().TryMakeShortBatch(gomock.Any(), gomock.Any()).Return([]string{consts.TestShortURL, consts.TestShortURL2}, nil)
 
 		originalURL := consts.TestOriginalURL
-		shortRequest := model.ShortURLRequest{
-			OriginalURL: originalURL,
+		originalURL2 := consts.TestOriginalURL2
+		shortRequest := model.BatchShortURLRequest{
+			{
+				CorrelationID: "1",
+				OriginalURL:   originalURL,
+			},
+			{
+				CorrelationID: "2",
+				OriginalURL:   originalURL2,
+			},
 		}
 		jsonRequest, _ := json.Marshal(shortRequest)
-		req := httptest.NewRequest(http.MethodPost, MakeShortJSONPath, bytes.NewBuffer(jsonRequest))
+		req := httptest.NewRequest(http.MethodPost, MakeShortBatchJSONPath, bytes.NewBuffer(jsonRequest))
 		rr := httptest.NewRecorder()
 		e.ServeHTTP(rr, req)
 
@@ -42,10 +50,16 @@ func TestMakeShortJSONHandler(t *testing.T) {
 
 		body, _ := io.ReadAll(resp.Body)
 
-		shortResponse := model.ShortURLResponse{}
+		shortResponse := model.BatchShortURLResponse{}
 		json.Unmarshal(body, &shortResponse)
-		shortURL := shortResponse.ShortURL
+		shortURL := shortResponse[0].ShortURL
+		shortURL2 := shortResponse[1].ShortURL
+		correlationID := shortResponse[0].CorrelationID
+		correlationID2 := shortResponse[1].CorrelationID
 
 		assert.NotEmpty(t, shortURL, "short URL must be not empty")
+		assert.NotEmpty(t, shortURL2, "short URL must be not empty")
+		assert.Equal(t, correlationID, "1", "correlation ID must be 1")
+		assert.Equal(t, correlationID2, "2", "correlation ID must be 2")
 	})
 }

@@ -6,11 +6,12 @@ import (
 )
 
 const (
-	MakeShortPath     = "/"
-	MakeShortJSONPath = "/api/shorten"
-	MakeOriginalPath  = "/:id"
-	OriginalPathParam = "id"
-	PingDBPath        = "/ping"
+	MakeShortPath          = "/"
+	MakeShortJSONPath      = "/api/shorten"
+	MakeShortBatchJSONPath = "/api/shorten/batch"
+	MakeOriginalPath       = "/:id"
+	OriginalPathParam      = "id"
+	PingDBPath             = "/ping"
 )
 
 type Handlers struct {
@@ -31,6 +32,7 @@ func (h *Handlers) RegisterHandlers() *Handlers {
 	h.RegisterMakeShortHandler()
 	h.RegisterMakeOriginalHandler()
 	h.RegisterMakeShortJSONHandler()
+	h.RegisterMakeShortBatchJSONHandler()
 	h.RegisterPingDBHandler()
 	return h
 }
