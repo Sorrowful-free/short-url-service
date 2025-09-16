@@ -31,7 +31,7 @@ func GetLocalConfig() *LocalConfig {
 	flag.StringVar(&localConfig.BaseURL, "b", "http://localhost:8080", "base URL")
 	flag.IntVar(&localConfig.UIDLength, "l", 8, "length of the short URL")
 	flag.StringVar(&localConfig.FileStoragePath, "f", "", "file storage path")
-	flag.StringVar(&localConfig.MigrationsPath, "m", "file://./../../migrations", "migrations path")
+	flag.StringVar(&localConfig.MigrationsPath, "m", "file://./migrations", "migrations path")
 	flag.StringVar(&localConfig.DatabaseDSN, "d", "", "postgres DSN")
 	flag.Parse()
 
