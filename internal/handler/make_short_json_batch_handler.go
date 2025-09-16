@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/labstack/echo/v4"
@@ -23,13 +24,17 @@ func (h *Handlers) RegisterMakeShortBatchJSONHandler() {
 			originalURLs[i] = request.OriginalURL
 		}
 
-		shortURLs, err := h.internalURLService.TryMakeShortBatch(c.Request().Context(), originalURLs)
+		shortUIDs, err := h.internalURLService.TryMakeShortBatch(c.Request().Context(), originalURLs)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
-		batchShortURLResponse := make([]model.BatchShortURLResponseDto, len(shortURLs))
-		for i, shortURL := range shortURLs {
+		batchShortURLResponse := make([]model.BatchShortURLResponseDto, len(shortUIDs))
+		for i, shortUID := range shortUIDs {
+			shortURL, err := url.JoinPath(h.internalBaseURL, shortUID)
+			if err != nil {
+				return c.String(http.StatusInternalServerError, err.Error())
+			}
 			batchShortURLResponse[i] = model.BatchShortURLResponseDto{
 				CorrelationID: batchShortURLRequest[i].CorrelationID,
 				ShortURL:      shortURL,
