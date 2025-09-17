@@ -49,6 +49,21 @@ func (mr *MockShortURLRepositoryMockRecorder) ContainsUID(ctx, shortUID interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ContainsUID", reflect.TypeOf((*MockShortURLRepository)(nil).ContainsUID), ctx, shortUID)
 }
 
+// GetByOriginalURL mocks base method.
+func (m *MockShortURLRepository) GetByOriginalURL(ctx context.Context, originalURL string) (model.ShortURLDto, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByOriginalURL", ctx, originalURL)
+	ret0, _ := ret[0].(model.ShortURLDto)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByOriginalURL indicates an expected call of GetByOriginalURL.
+func (mr *MockShortURLRepositoryMockRecorder) GetByOriginalURL(ctx, originalURL interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByOriginalURL", reflect.TypeOf((*MockShortURLRepository)(nil).GetByOriginalURL), ctx, originalURL)
+}
+
 // GetByUID mocks base method.
 func (m *MockShortURLRepository) GetByUID(ctx context.Context, shortUID string) (model.ShortURLDto, error) {
 	m.ctrl.T.Helper()

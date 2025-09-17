@@ -21,7 +21,7 @@ func TestSimpleShortURLService(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	service, err := NewSimpleService(consts.TestUIDLength, shortURLRepository, l)
+	service, err := NewSimpleService(consts.TestUIDLength, consts.TestRetryCount, shortURLRepository, l)
 	if err != nil {
 		t.Fatal(err)
 	}

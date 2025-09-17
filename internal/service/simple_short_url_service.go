@@ -13,13 +13,15 @@ import (
 
 type SimpleShortURLService struct {
 	uidLength          int
+	retryCount         int
 	logger             logger.Logger
 	ShortURLRepository repository.ShortURLRepository
 }
 
-func NewSimpleService(uidLength int, shortURLRepository repository.ShortURLRepository, logger logger.Logger) (ShortURLService, error) {
+func NewSimpleService(uidLength int, retryCount int, shortURLRepository repository.ShortURLRepository, logger logger.Logger) (ShortURLService, error) {
 	service := SimpleShortURLService{
 		uidLength:          uidLength,
+		retryCount:         retryCount,
 		logger:             logger,
 		ShortURLRepository: shortURLRepository,
 	}
@@ -41,7 +43,11 @@ func (service SimpleShortURLService) TryMakeShort(ctx context.Context, originalU
 	if err != nil {
 		var originalURLConflictError *repository.OriginalURLConflictRepositoryError
 		if errors.As(err, &originalURLConflictError) {
-			return originalURLConflictError.ShortURL, NewOriginalURLConflictServiceError(originalURLConflictError.OriginalURL)
+			dto, err = service.ShortURLRepository.GetByOriginalURL(ctx, originalURLConflictError.OriginalURL)
+			if err != nil {
+				return "", fmt.Errorf("failed to get short url by original url: %w", err)
+			}
+			return dto.ShortUID, NewOriginalURLConflictServiceError(dto.OriginalURL)
 		}
 
 		return "", fmt.Errorf("failed to save short url: %w", err)
@@ -100,7 +106,13 @@ func (service SimpleShortURLService) makeSimpleUUIDString(ctx context.Context) (
 	shortUID := ""
 	err := error(nil)
 
-	for exist := true; exist; { //trying regenerate guid if it wal allready registered
+	retryCount := service.retryCount
+	for exist := true; exist; retryCount-- { //trying regenerate guid if it wal allready registered
+
+		if retryCount == 0 {
+			return "", fmt.Errorf("failed to make uid: retry count exceeded")
+		}
+
 		shortUID, err = makeSimpleUIDString(service.uidLength)
 		exist = service.ShortURLRepository.ContainsUID(ctx, shortUID)
 

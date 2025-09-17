@@ -37,17 +37,7 @@ func (r *PostgresShortURLRepository) Save(ctx context.Context, shortURL model.Sh
 	var pgxErr *pgconn.PgError
 	if err != nil {
 		if errors.As(err, &pgxErr) && pgxErr.Code == pgerrcode.UniqueViolation {
-
-			shortUID := ""
-			originalURL := shortURL.OriginalURL
-
-			row := r.db.QueryRowContext(ctx, "SELECT short_uid FROM short_urls WHERE original_url = $1", originalURL)
-			if row.Err() != nil {
-				return err
-			}
-			if err := row.Scan(&shortUID); err == nil {
-				return NewOriginalURLConflictRepositoryError(shortUID, shortURL.OriginalURL)
-			}
+			return NewOriginalURLConflictRepositoryError(shortURL.OriginalURL)
 		}
 		return err
 	}
@@ -108,6 +98,21 @@ func (r *PostgresShortURLRepository) GetByUID(ctx context.Context, shortUID stri
 		return model.ShortURLDto{}, row.Err()
 	}
 	if err := row.Scan(&originalURL); err != nil {
+		return model.ShortURLDto{}, err
+	}
+	return model.ShortURLDto{ShortUID: shortUID, OriginalURL: originalURL}, nil
+}
+
+func (r *PostgresShortURLRepository) GetByOriginalURL(ctx context.Context, originalURL string) (model.ShortURLDto, error) {
+	if ctx.Err() != nil {
+		return model.ShortURLDto{}, ctx.Err()
+	}
+	var shortUID string
+	row := r.db.QueryRowContext(ctx, "SELECT short_uid FROM short_urls WHERE original_url = $1", originalURL)
+	if row.Err() != nil {
+		return model.ShortURLDto{}, row.Err()
+	}
+	if err := row.Scan(&shortUID); err != nil {
 		return model.ShortURLDto{}, err
 	}
 	return model.ShortURLDto{ShortUID: shortUID, OriginalURL: originalURL}, nil
