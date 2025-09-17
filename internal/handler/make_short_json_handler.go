@@ -33,23 +33,15 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 		}
 
 		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeJSON)
-		c.Response().WriteHeader(http.StatusCreated)
 
 		shortResponse := model.ShortURLResponse{
 			ShortURL: shortURL,
 		}
 
 		if originalURLConflictError != nil {
-			c.Response().Status = http.StatusConflict
+			return c.JSON(http.StatusConflict, shortResponse)
 		}
 
-		enc := json.NewEncoder(c.Response().Writer)
-		err = enc.Encode(shortResponse)
-
-		if err != nil {
-			return c.String(http.StatusInternalServerError, err.Error())
-		}
-
-		return nil
+		return c.JSON(http.StatusCreated, shortResponse)
 	})
 }

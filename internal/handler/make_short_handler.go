@@ -29,7 +29,6 @@ func (h *Handlers) RegisterMakeShortHandler() {
 		}
 
 		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeText)
-		c.Response().WriteHeader(http.StatusCreated)
 
 		if originalURLConflictError != nil {
 			return c.String(http.StatusConflict, shortURL)
