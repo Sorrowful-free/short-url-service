@@ -85,7 +85,7 @@ func (a *App) InitURLRepository() error {
 }
 
 func (a *App) InitURLService() error {
-	urlService, err := service.NewSimpleService(a.internalConfig.UIDLength, a.internalURLRepository, a.internalLogger)
+	urlService, err := service.NewSimpleService(a.internalConfig.UIDLength, a.internalConfig.UIDRetryCount, a.internalURLRepository, a.internalLogger)
 	if err != nil {
 		return err
 	}

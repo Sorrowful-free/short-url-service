@@ -11,6 +11,7 @@ type LocalConfig struct {
 	ListenAddr      string
 	BaseURL         string
 	UIDLength       int
+	UIDRetryCount   int
 	FileStoragePath string
 	MigrationsPath  string
 	DatabaseDSN     string

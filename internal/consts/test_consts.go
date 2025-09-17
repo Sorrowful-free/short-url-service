@@ -4,7 +4,7 @@ const (
 	TestFileStoragePath     = "/test_data/short_urls_test.json"
 	TestBaseURL             = "http://localhost:8080"
 	TestUIDLength           = 8
-	TestRetryCount          = 10
+	TestUIDRetryCount       = 10
 	TestListenAddr          = "localhost:8080"
 	TestOriginalURL         = "http://example.com"
 	TestShortURL            = "http://localhost:8080/1234567890"
