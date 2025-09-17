@@ -3,11 +3,14 @@ package service
 import (
 	"context"
 	"crypto/rand"
+	"errors"
 	"fmt"
 
 	"github.com/Sorrowful-free/short-url-service/internal/logger"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/Sorrowful-free/short-url-service/internal/repository"
+	"github.com/Sorrowful-free/short-url-service/internal/repository/repository_errors"
+	"github.com/Sorrowful-free/short-url-service/internal/service/service_errors"
 )
 
 type SimpleShortURLService struct {
@@ -38,6 +41,11 @@ func (service SimpleShortURLService) TryMakeShort(ctx context.Context, originalU
 
 	err = service.ShortURLRepository.Save(ctx, dto)
 	if err != nil {
+		var originalURLConflictError *repository_errors.OriginalURLConflictRepositoryError
+		if errors.As(err, &originalURLConflictError) {
+			return originalURLConflictError.ShortURL, service_errors.NewOriginalURLConflictServiceError(originalURLConflictError.OriginalURL)
+		}
+
 		return "", fmt.Errorf("failed to save short url: %w", err)
 	}
 

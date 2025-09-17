@@ -2,11 +2,13 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
+	"github.com/Sorrowful-free/short-url-service/internal/service/service_errors"
 	"github.com/labstack/echo/v4"
 )
 
@@ -25,7 +27,8 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 		}
 
 		shortURL, err := url.JoinPath(h.internalBaseURL, shortUID)
-		if err != nil {
+		var originalURLConflictError *service_errors.OriginalURLConflictServiceError
+		if err != nil && !errors.As(err, &originalURLConflictError) {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
@@ -36,8 +39,13 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 			ShortURL: shortURL,
 		}
 
+		if originalURLConflictError != nil {
+			c.Response().Status = http.StatusConflict
+		}
+
 		enc := json.NewEncoder(c.Response().Writer)
 		err = enc.Encode(shortResponse)
+
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}

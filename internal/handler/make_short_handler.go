@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
+	"github.com/Sorrowful-free/short-url-service/internal/service/service_errors"
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,7 +18,8 @@ func (h *Handlers) RegisterMakeShortHandler() {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), string(originalURL))
-		if err != nil {
+		var originalURLConflictError *service_errors.OriginalURLConflictServiceError
+		if err != nil && !errors.As(err, &originalURLConflictError) {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
@@ -27,6 +30,10 @@ func (h *Handlers) RegisterMakeShortHandler() {
 
 		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeText)
 		c.Response().WriteHeader(http.StatusCreated)
+
+		if originalURLConflictError != nil {
+			return c.String(http.StatusConflict, shortURL)
+		}
 
 		return c.String(http.StatusCreated, shortURL)
 	})

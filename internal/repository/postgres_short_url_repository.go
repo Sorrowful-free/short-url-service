@@ -1,12 +1,17 @@
 package repository
 
 import (
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"context"
 	"database/sql"
 
+	"errors"
+
 	"github.com/Sorrowful-free/short-url-service/internal/model"
+	"github.com/Sorrowful-free/short-url-service/internal/repository/repository_errors"
 )
 
 type PostgresShortURLRepository struct {
@@ -30,7 +35,21 @@ func (r *PostgresShortURLRepository) Save(ctx context.Context, shortURL model.Sh
 		return ctx.Err()
 	}
 	_, err := r.db.ExecContext(ctx, "INSERT INTO short_urls (short_uid, original_url) VALUES ($1, $2)", shortURL.ShortUID, shortURL.OriginalURL)
+	var pgxErr *pgconn.PgError
 	if err != nil {
+		if errors.As(err, &pgxErr) && pgxErr.Code == pgerrcode.UniqueViolation {
+
+			shortUID := ""
+			originalURL := shortURL.OriginalURL
+
+			row := r.db.QueryRowContext(ctx, "SELECT short_uid FROM short_urls WHERE original_url = $1", originalURL)
+			if row.Err() != nil {
+				return err
+			}
+			if err := row.Scan(&shortUID); err == nil {
+				return repository_errors.NewOriginalURLConflictRepositoryError(shortUID, shortURL.OriginalURL)
+			}
+		}
 		return err
 	}
 	return nil
