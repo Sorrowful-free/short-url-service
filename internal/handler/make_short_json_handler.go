@@ -22,13 +22,13 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), shortRequest.OriginalURL)
-		if err != nil {
+		var originalURLConflictError *service.OriginalURLConflictServiceError
+		if err != nil && !errors.As(err, &originalURLConflictError) {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
 		shortURL, err := url.JoinPath(h.internalBaseURL, shortUID)
-		var originalURLConflictError *service.OriginalURLConflictServiceError
-		if err != nil && !errors.As(err, &originalURLConflictError) {
+		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
