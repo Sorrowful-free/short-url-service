@@ -1,4 +1,4 @@
-package service_errors
+package service
 
 import "fmt"
 

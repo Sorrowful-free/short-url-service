@@ -11,7 +11,6 @@ import (
 	"errors"
 
 	"github.com/Sorrowful-free/short-url-service/internal/model"
-	"github.com/Sorrowful-free/short-url-service/internal/repository/repository_errors"
 )
 
 type PostgresShortURLRepository struct {
@@ -47,7 +46,7 @@ func (r *PostgresShortURLRepository) Save(ctx context.Context, shortURL model.Sh
 				return err
 			}
 			if err := row.Scan(&shortUID); err == nil {
-				return repository_errors.NewOriginalURLConflictRepositoryError(shortUID, shortURL.OriginalURL)
+				return NewOriginalURLConflictRepositoryError(shortUID, shortURL.OriginalURL)
 			}
 		}
 		return err

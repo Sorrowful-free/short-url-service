@@ -1,4 +1,4 @@
-package repository_errors
+package repository
 
 import "fmt"
 
