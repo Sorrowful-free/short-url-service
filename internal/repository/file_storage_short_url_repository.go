@@ -29,10 +29,6 @@ func (r *FileStorageShortURLRepository) Save(ctx context.Context, shortURL model
 		return ctx.Err()
 	}
 
-	if r.containsOriginalURL(ctx, shortURL.OriginalURL) {
-		return NewOriginalURLConflictRepositoryError(shortURL.OriginalURL)
-	}
-
 	r.shortURLs = append(r.shortURLs, model.NewShortURLSafeDto(shortURL))
 	r.fileStorage.SafeAll(r.shortURLs)
 	return nil
@@ -88,16 +84,4 @@ func (r *FileStorageShortURLRepository) GetByOriginalURL(ctx context.Context, or
 
 func (r *FileStorageShortURLRepository) Ping(ctx context.Context) error {
 	return nil
-}
-
-func (r *FileStorageShortURLRepository) containsOriginalURL(ctx context.Context, originalURL string) bool {
-	if ctx.Err() != nil {
-		return false
-	}
-	for _, shortURL := range r.shortURLs {
-		if shortURL.OriginalURL == originalURL {
-			return true
-		}
-	}
-	return false
 }
