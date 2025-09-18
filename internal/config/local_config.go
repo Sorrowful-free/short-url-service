@@ -11,7 +11,10 @@ type LocalConfig struct {
 	ListenAddr      string
 	BaseURL         string
 	UIDLength       int
+	UIDRetryCount   int
 	FileStoragePath string
+	MigrationsPath  string
+	DatabaseDSN     string
 }
 
 var localConfig *LocalConfig
@@ -28,7 +31,10 @@ func GetLocalConfig() *LocalConfig {
 	flag.StringVar(&localConfig.ListenAddr, "a", "localhost:8080", "listen address")
 	flag.StringVar(&localConfig.BaseURL, "b", "http://localhost:8080", "base URL")
 	flag.IntVar(&localConfig.UIDLength, "l", 8, "length of the short URL")
-	flag.StringVar(&localConfig.FileStoragePath, "f", "tmp_short_urls.json", "file storage path")
+	flag.IntVar(&localConfig.UIDRetryCount, "r", 10, "retry count for the short URL")
+	flag.StringVar(&localConfig.FileStoragePath, "f", "", "file storage path")
+	flag.StringVar(&localConfig.MigrationsPath, "m", "file://./migrations", "migrations path")
+	flag.StringVar(&localConfig.DatabaseDSN, "d", "", "postgres DSN")
 	flag.Parse()
 
 	//override default values with values from environment variables if they are set
@@ -56,5 +62,23 @@ func GetLocalConfig() *LocalConfig {
 		localConfig.FileStoragePath = fileStoragePath
 	}
 
+	migrationsPath := os.Getenv("MIGRATIONS_PATH")
+	if migrationsPath != "" {
+		localConfig.MigrationsPath = migrationsPath
+	}
+
+	databaseDSN := os.Getenv("DATABASE_DSN")
+	if databaseDSN != "" {
+		localConfig.DatabaseDSN = databaseDSN
+	}
+
 	return localConfig
+}
+
+func (c *LocalConfig) HasFileStoragePath() bool {
+	return c.FileStoragePath != ""
+}
+
+func (c *LocalConfig) HasDatabaseDSN() bool {
+	return c.DatabaseDSN != ""
 }

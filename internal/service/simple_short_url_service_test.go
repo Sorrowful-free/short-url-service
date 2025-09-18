@@ -1,10 +1,12 @@
 package service
 
 import (
+	"context"
 	"testing"
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
 	"github.com/Sorrowful-free/short-url-service/internal/logger"
+	"github.com/Sorrowful-free/short-url-service/internal/repository"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,7 +16,12 @@ func TestSimpleShortURLService(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	service, err := NewSimpleService(consts.TestUIDLength, consts.TestFileStoragePath, l)
+
+	shortURLRepository, err := repository.NewSimpleShortURLRepository(consts.TestFileStoragePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	service, err := NewSimpleService(consts.TestUIDLength, consts.TestUIDRetryCount, shortURLRepository, l)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +42,7 @@ func TestSimpleShortURLService(t *testing.T) {
 
 	t.Run("trying to make short url", func(t *testing.T) {
 
-		tmpShortUID, err := service.TryMakeShort(originalURL)
+		tmpShortUID, err := service.TryMakeShort(context.TODO(), originalURL)
 		assert.NotEmpty(t, tmpShortUID, "short url must be not empty")
 		assert.NoError(t, err, "short url must generate without any error")
 		shortUID = tmpShortUID
@@ -43,7 +50,7 @@ func TestSimpleShortURLService(t *testing.T) {
 
 	t.Run("trying to make original url", func(t *testing.T) {
 
-		tmpOriginalURL, err := service.TryMakeOriginal(shortUID)
+		tmpOriginalURL, err := service.TryMakeOriginal(context.TODO(), shortUID)
 		assert.NotEmpty(t, tmpOriginalURL, "original url must be not empty")
 		assert.NoError(t, err, "original url must generate without any error")
 		assert.Equal(t, originalURL, tmpOriginalURL, "service must return the same url")

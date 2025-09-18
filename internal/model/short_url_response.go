@@ -1,5 +1,5 @@
 package model
 
-type ShortResponse struct {
+type ShortURLResponse struct {
 	ShortURL string `json:"result"`
 }
