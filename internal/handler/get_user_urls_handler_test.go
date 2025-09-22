@@ -80,9 +80,12 @@ func TestGetUserUrlsHandler(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "expected status code %d, received %d", http.StatusOK, resp.StatusCode)
 
 		body, _ := io.ReadAll(resp.Body)
-		shortURL := model.GetUserUrlsResponse{}
-		json.Unmarshal(body, &shortURL)
-		assert.Equal(t, consts.TestShortUID, shortURL[0].ShortUID, "expected short URL %s, received %s", consts.TestShortUID, shortURL[0].ShortUID)
+		shortURL := model.UserShortURLResponse{}
+		err = json.Unmarshal(body, &shortURL)
+		if err != nil {
+			t.Fatalf("failed to unmarshal body: %v", err)
+		}
+		assert.Equal(t, consts.TestShortURL, shortURL[0].ShortURL, "expected short URL %s, received %s", consts.TestShortUID, shortURL[0].ShortURL)
 		assert.Equal(t, consts.TestOriginalURL, shortURL[0].OriginalURL, "expected original URL %s, received %s", consts.TestOriginalURL, shortURL[0].OriginalURL)
 	})
 

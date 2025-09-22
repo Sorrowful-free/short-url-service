@@ -101,7 +101,7 @@ func (service SimpleShortURLService) makeSimpleUUIDString(ctx context.Context) (
 	err := error(nil)
 
 	retryCount := service.retryCount
-	for exist := true; exist; retryCount-- { //trying regenerate guid if it was already registered
+	for exist := true; exist; retryCount-- { //trying regenerate guid if it was allready registered
 
 		if retryCount == 0 {
 			return "", fmt.Errorf("failed to make uid: retry count exceeded")
