@@ -125,6 +125,9 @@ func (a *App) Init() error {
 	if err := a.InitConfig(); err != nil {
 		return err
 	}
+	if err := a.InitUserIDEncryptor(); err != nil {
+		return err
+	}
 	if err := a.InitMigration(); err != nil {
 		return err
 	}
