@@ -133,15 +133,14 @@ func (r *PostgresShortURLRepository) GetUserUrls(ctx context.Context, userID str
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
-	return nil, nil
 
-	shortURLs := make([]model.ShortURLDto, 0)
 	rows, err := r.db.QueryContext(ctx, "SELECT short_uid, original_url FROM short_urls WHERE user_id = $1", userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
+	shortURLs := make([]model.ShortURLDto, 0)
 	for rows.Next() {
 		var shortUID string
 		var originalURL string
