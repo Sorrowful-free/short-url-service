@@ -104,3 +104,10 @@ func HasUserID(c echo.Context) bool {
 	}
 	return false
 }
+
+func TryGetUserID(c echo.Context) string {
+	if authContext, ok := c.(*SimpleAuthContext); ok {
+		return authContext.UserID
+	}
+	return FallbackUserID
+}

@@ -55,12 +55,10 @@ func TestGetUserUrlsHandler(t *testing.T) {
 		e := echo.New()
 		ctrl := gomock.NewController(t)
 		urlService := mocks.NewMockShortURLService(ctrl)
-
 		userIDEncryptor, err := crypto.NewSha256UserIDEncryptor(consts.TestUserIDCriptoKey)
 		if err != nil {
 			t.Fatalf("failed to create user ID encryptor: %v", err)
 		}
-
 		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService)
 		if err != nil {
 			t.Fatalf("failed to create handlers: %v", err)

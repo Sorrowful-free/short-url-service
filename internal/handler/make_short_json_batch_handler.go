@@ -25,9 +25,9 @@ func (h *Handlers) RegisterMakeShortBatchJSONHandler() {
 			originalURLs[i] = request.OriginalURL
 		}
 
-		authContext := c.(*middlewares.SimpleAuthContext)
+		userID := middlewares.TryGetUserID(c)
 
-		shortUIDs, err := h.internalURLService.TryMakeShortBatch(c.Request().Context(), authContext.UserID, originalURLs)
+		shortUIDs, err := h.internalURLService.TryMakeShortBatch(c.Request().Context(), userID, originalURLs)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}

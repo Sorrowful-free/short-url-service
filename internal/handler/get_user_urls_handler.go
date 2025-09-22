@@ -12,9 +12,9 @@ import (
 func (h *Handlers) RegisterGetUserUrlsHandler() {
 	h.internalEcho.GET(GetUserURLsPath, func(c echo.Context) error {
 
-		authContext := c.(*middlewares.SimpleAuthContext)
+		userID := middlewares.TryGetUserID(c)
 
-		shortURLDTOs, err := h.internalURLService.GetUserUrls(c.Request().Context(), authContext.UserID)
+		shortURLDTOs, err := h.internalURLService.GetUserUrls(c.Request().Context(), userID)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}

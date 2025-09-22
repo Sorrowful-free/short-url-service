@@ -19,10 +19,10 @@ func (h *Handlers) RegisterMakeShortHandler() {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
-		authContext := c.(*middlewares.SimpleAuthContext)
+		userID := middlewares.TryGetUserID(c)
 
 		var originalURLConflictError *service.OriginalURLConflictServiceError
-		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), authContext.UserID, string(originalURL))
+		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), userID, string(originalURL))
 		if err != nil && !errors.As(err, &originalURLConflictError) {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
