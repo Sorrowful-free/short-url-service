@@ -19,8 +19,8 @@ func (h *Handlers) RegisterMakeShortHandler() {
 		}
 
 		userID := ""
-		if h.HasValidUserId(c) {
-			userID = h.GetUserId(c)
+		if h.HasValidUserID(c) {
+			userID = h.GetUserID(c)
 		} else {
 			userID = h.GenerateUserId(c)
 		}
@@ -37,7 +37,7 @@ func (h *Handlers) RegisterMakeShortHandler() {
 		}
 
 		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeText)
-		h.SetUserId(c, userID)
+		h.SetUserID(c, userID)
 
 		if originalURLConflictError != nil {
 			return c.String(http.StatusConflict, shortURL)

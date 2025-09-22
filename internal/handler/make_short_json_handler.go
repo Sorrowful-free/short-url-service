@@ -23,8 +23,8 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 		}
 
 		userID := ""
-		if h.HasValidUserId(c) {
-			userID = h.GetUserId(c)
+		if h.HasValidUserID(c) {
+			userID = h.GetUserID(c)
 		} else {
 			userID = h.GenerateUserId(c)
 		}

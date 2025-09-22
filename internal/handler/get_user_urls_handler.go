@@ -8,13 +8,13 @@ import (
 )
 
 func (h *Handlers) RegisterGetUserUrlsHandler() {
-	h.internalEcho.GET(GetUserUrlPath, func(c echo.Context) error {
+	h.internalEcho.GET(GetUserPath, func(c echo.Context) error {
 
-		if !h.HasValidUserId(c) {
+		if !h.HasValidUserID(c) {
 			return c.String(http.StatusUnauthorized, "unauthorized")
 		}
 
-		userID := h.GetUserId(c)
+		userID := h.GetUserID(c)
 
 		urls, err := h.internalURLService.GetUserUrls(c.Request().Context(), userID)
 		if err != nil {
