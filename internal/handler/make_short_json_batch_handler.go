@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/labstack/echo/v4"
 )
@@ -19,22 +20,14 @@ func (h *Handlers) RegisterMakeShortBatchJSONHandler() {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
-		userID := ""
-		if h.HasUserID(c) {
-			userID, err = h.GetUserID(c)
-			if err != nil {
-				return c.String(http.StatusUnauthorized, "unauthorized")
-			}
-		} else {
-			userID = h.GenerateUserID(c)
-		}
-
 		originalURLs := make([]string, len(batchShortURLRequest))
 		for i, request := range batchShortURLRequest {
 			originalURLs[i] = request.OriginalURL
 		}
 
-		shortUIDs, err := h.internalURLService.TryMakeShortBatch(c.Request().Context(), userID, originalURLs)
+		authContext := c.(*middlewares.SimpleAuthContext)
+
+		shortUIDs, err := h.internalURLService.TryMakeShortBatch(c.Request().Context(), authContext.UserID, originalURLs)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
@@ -50,8 +43,6 @@ func (h *Handlers) RegisterMakeShortBatchJSONHandler() {
 				ShortURL:      shortURL,
 			}
 		}
-
-		h.SetUserID(c, userID)
 		return c.JSON(http.StatusCreated, batchShortURLResponse)
 	})
 }

@@ -11,4 +11,6 @@ const (
 	HeaderEncodingGzip    = "gzip"
 
 	HeaderLocation = "Location"
+
+	UserIDCookieName = "userID"
 )

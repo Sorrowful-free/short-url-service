@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
+	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
 	"github.com/labstack/echo/v4"
@@ -22,17 +23,9 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
-		userID := ""
-		if h.HasUserID(c) {
-			userID, err = h.GetUserID(c)
-			if err != nil {
-				return c.String(http.StatusUnauthorized, "unauthorized")
-			}
-		} else {
-			userID = h.GenerateUserID(c)
-		}
+		authContext := c.(*middlewares.SimpleAuthContext)
 
-		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), userID, shortRequest.OriginalURL)
+		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), authContext.UserID, shortRequest.OriginalURL)
 		var originalURLConflictError *service.OriginalURLConflictServiceError
 		if err != nil && !errors.As(err, &originalURLConflictError) {
 			return c.String(http.StatusInternalServerError, err.Error())
@@ -44,7 +37,6 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 		}
 
 		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeJSON)
-		h.SetUserID(c, userID)
 
 		shortResponse := model.ShortURLResponse{
 			ShortURL: shortURL,

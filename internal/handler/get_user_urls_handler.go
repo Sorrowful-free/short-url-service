@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/labstack/echo/v4"
 )
@@ -11,18 +12,9 @@ import (
 func (h *Handlers) RegisterGetUserUrlsHandler() {
 	h.internalEcho.GET(GetUserURLsPath, func(c echo.Context) error {
 
-		userID := ""
-		var err error
-		if h.HasUserID(c) {
-			userID, err = h.GetUserID(c)
-			if err != nil {
-				return c.String(http.StatusUnauthorized, "unauthorized")
-			}
-		} else {
-			userID = h.GenerateUserID(c)
-		}
+		authContext := c.(*middlewares.SimpleAuthContext)
 
-		shortURLDTOs, err := h.internalURLService.GetUserUrls(c.Request().Context(), userID)
+		shortURLDTOs, err := h.internalURLService.GetUserUrls(c.Request().Context(), authContext.UserID)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}

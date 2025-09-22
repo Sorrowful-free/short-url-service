@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
+	"github.com/Sorrowful-free/short-url-service/internal/crypto"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/Sorrowful-free/short-url-service/mocks"
 	"github.com/golang/mock/gomock"
@@ -20,8 +21,11 @@ func TestGetUserUrlsHandler(t *testing.T) {
 		e := echo.New()
 		ctrl := gomock.NewController(t)
 		urlService := mocks.NewMockShortURLService(ctrl)
-
-		handlers, err := NewHandlers(e, urlService, consts.TestBaseURL, consts.TestUserIDCriptoKey)
+		userIDEncryptor, err := crypto.NewSha256UserIDEncryptor(consts.TestUserIDCriptoKey)
+		if err != nil {
+			t.Fatalf("failed to create user ID encryptor: %v", err)
+		}
+		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService)
 		if err != nil {
 			t.Fatalf("failed to create handlers: %v", err)
 		}
@@ -29,12 +33,12 @@ func TestGetUserUrlsHandler(t *testing.T) {
 
 		urlService.EXPECT().GetUserUrls(gomock.Any(), gomock.Any()).Return([]model.ShortURLDto{}, nil)
 
-		encryptedUserID, err := handlers.internalUserIDEncryptor.Encrypt(consts.TestUserID)
+		encryptedUserID, err := userIDEncryptor.Encrypt(consts.TestUserID)
 		if err != nil {
 			t.Fatalf("failed to encrypt user ID: %v", err)
 		}
 		req := httptest.NewRequest(http.MethodGet, GetUserURLsPath, nil)
-		req.AddCookie(&http.Cookie{Name: UserIDCookieName, Value: encryptedUserID})
+		req.AddCookie(&http.Cookie{Name: consts.UserIDCookieName, Value: encryptedUserID})
 		rr := httptest.NewRecorder()
 		e.ServeHTTP(rr, req)
 
@@ -52,7 +56,12 @@ func TestGetUserUrlsHandler(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		urlService := mocks.NewMockShortURLService(ctrl)
 
-		handlers, err := NewHandlers(e, urlService, consts.TestBaseURL, consts.TestUserIDCriptoKey)
+		userIDEncryptor, err := crypto.NewSha256UserIDEncryptor(consts.TestUserIDCriptoKey)
+		if err != nil {
+			t.Fatalf("failed to create user ID encryptor: %v", err)
+		}
+
+		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService)
 		if err != nil {
 			t.Fatalf("failed to create handlers: %v", err)
 		}
@@ -65,12 +74,12 @@ func TestGetUserUrlsHandler(t *testing.T) {
 			},
 		}, nil)
 
-		encryptedUserID, err := handlers.internalUserIDEncryptor.Encrypt(consts.TestUserID)
+		encryptedUserID, err := userIDEncryptor.Encrypt(consts.TestUserID)
 		if err != nil {
 			t.Fatalf("failed to encrypt user ID: %v", err)
 		}
 		req := httptest.NewRequest(http.MethodGet, GetUserURLsPath, nil)
-		req.AddCookie(&http.Cookie{Name: UserIDCookieName, Value: encryptedUserID})
+		req.AddCookie(&http.Cookie{Name: consts.UserIDCookieName, Value: encryptedUserID})
 		rr := httptest.NewRecorder()
 		e.ServeHTTP(rr, req)
 

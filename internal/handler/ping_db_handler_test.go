@@ -19,7 +19,7 @@ func TestPingDBHandler(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		urlService := mocks.NewMockShortURLService(ctrl)
 
-		handlers, err := NewHandlers(e, urlService, consts.TestBaseURL, consts.TestUserIDCriptoKey)
+		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService)
 		if err != nil {
 			t.Fatalf("failed to create handlers: %v", err)
 		}
@@ -42,7 +42,7 @@ func TestPingDBHandler(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		urlService := mocks.NewMockShortURLService(ctrl)
 
-		handlers, err := NewHandlers(e, urlService, consts.TestBaseURL, consts.TestUserIDCriptoKey)
+		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService)
 		if err != nil {
 			t.Fatalf("failed to create handlers: %v", err)
 		}
