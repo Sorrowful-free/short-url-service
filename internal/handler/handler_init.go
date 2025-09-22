@@ -17,7 +17,7 @@ const (
 	MakeOriginalPath       = "/:id"
 	OriginalPathParam      = "id"
 	PingDBPath             = "/ping"
-	GetUserPath            = "/api/user/urls"
+	GetUserURLsPath        = "/api/user/urls"
 
 	FallbackUserID   = "0000000000000000"
 	UserIDCookieName = "userID"
@@ -62,13 +62,13 @@ func (h *Handlers) GenerateUserID(c echo.Context) string {
 	return userID
 }
 
-func (h *Handlers) GetUserID(c echo.Context) string {
+func (h *Handlers) GetUserID(c echo.Context) (string, error) {
 	userIDCookie := c.Request().Cookies()[0].Value
 	userID, err := h.internalUserIDEncryptor.Decrypt(userIDCookie)
 	if err != nil {
-		return FallbackUserID
+		return FallbackUserID, err
 	}
-	return userID
+	return userID, nil
 }
 
 func (h *Handlers) SetUserID(c echo.Context, userID string) {
@@ -87,18 +87,15 @@ func (h *Handlers) SetUserID(c echo.Context, userID string) {
 	})
 }
 
-func (h *Handlers) HasValidUserID(c echo.Context) bool {
+func (h *Handlers) HasUserID(c echo.Context) bool {
 	cookies := c.Request().Cookies()
 	if len(cookies) == 0 {
 		return false
 	}
+
 	for _, cookie := range cookies {
 		if cookie.Name == UserIDCookieName {
-			userID, err := h.internalUserIDEncryptor.Decrypt(cookie.Value)
-			if err != nil {
-				return false
-			}
-			return userID != ""
+			return true
 		}
 	}
 	return false

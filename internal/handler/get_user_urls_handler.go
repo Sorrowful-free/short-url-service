@@ -9,13 +9,18 @@ import (
 )
 
 func (h *Handlers) RegisterGetUserUrlsHandler() {
-	h.internalEcho.GET(GetUserPath, func(c echo.Context) error {
+	h.internalEcho.GET(GetUserURLsPath, func(c echo.Context) error {
 
-		if !h.HasValidUserID(c) {
-			return c.String(http.StatusUnauthorized, "unauthorized")
+		userID := ""
+		var err error
+		if h.HasUserID(c) {
+			userID, err = h.GetUserID(c)
+			if err != nil {
+				return c.String(http.StatusUnauthorized, "unauthorized")
+			}
+		} else {
+			userID = h.GenerateUserID(c)
 		}
-
-		userID := h.GetUserID(c)
 
 		shortURLDTOs, err := h.internalURLService.GetUserUrls(c.Request().Context(), userID)
 		if err != nil {

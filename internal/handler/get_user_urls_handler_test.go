@@ -33,7 +33,7 @@ func TestGetUserUrlsHandler(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to encrypt user ID: %v", err)
 		}
-		req := httptest.NewRequest(http.MethodGet, GetUserPath, nil)
+		req := httptest.NewRequest(http.MethodGet, GetUserURLsPath, nil)
 		req.AddCookie(&http.Cookie{Name: UserIDCookieName, Value: encryptedUserID})
 		rr := httptest.NewRecorder()
 		e.ServeHTTP(rr, req)
@@ -69,7 +69,7 @@ func TestGetUserUrlsHandler(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to encrypt user ID: %v", err)
 		}
-		req := httptest.NewRequest(http.MethodGet, GetUserPath, nil)
+		req := httptest.NewRequest(http.MethodGet, GetUserURLsPath, nil)
 		req.AddCookie(&http.Cookie{Name: UserIDCookieName, Value: encryptedUserID})
 		rr := httptest.NewRecorder()
 		e.ServeHTTP(rr, req)

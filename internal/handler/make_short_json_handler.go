@@ -23,8 +23,11 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 		}
 
 		userID := ""
-		if h.HasValidUserID(c) {
-			userID = h.GetUserID(c)
+		if h.HasUserID(c) {
+			userID, err = h.GetUserID(c)
+			if err != nil {
+				return c.String(http.StatusUnauthorized, "unauthorized")
+			}
 		} else {
 			userID = h.GenerateUserID(c)
 		}
