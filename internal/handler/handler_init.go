@@ -54,7 +54,7 @@ func (h *Handlers) RegisterHandlers() *Handlers {
 	return h
 }
 
-func (h *Handlers) GenerateUserId(c echo.Context) string {
+func (h *Handlers) GenerateUserID(c echo.Context) string {
 	userID, err := crypto.GenerateRandomSequenceString(consts.TestUserIDLength)
 	if err != nil {
 		return FallbackUserID

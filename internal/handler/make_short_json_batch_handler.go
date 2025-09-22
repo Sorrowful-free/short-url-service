@@ -23,7 +23,7 @@ func (h *Handlers) RegisterMakeShortBatchJSONHandler() {
 		if h.HasValidUserID(c) {
 			userID = h.GetUserID(c)
 		} else {
-			userID = h.GenerateUserId(c)
+			userID = h.GenerateUserID(c)
 		}
 
 		originalURLs := make([]string, len(batchShortURLRequest))
@@ -48,6 +48,7 @@ func (h *Handlers) RegisterMakeShortBatchJSONHandler() {
 			}
 		}
 
+		h.SetUserID(c, userID)
 		return c.JSON(http.StatusCreated, batchShortURLResponse)
 	})
 }

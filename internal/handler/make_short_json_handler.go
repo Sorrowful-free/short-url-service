@@ -26,7 +26,7 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 		if h.HasValidUserID(c) {
 			userID = h.GetUserID(c)
 		} else {
-			userID = h.GenerateUserId(c)
+			userID = h.GenerateUserID(c)
 		}
 
 		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), userID, shortRequest.OriginalURL)
@@ -41,6 +41,7 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 		}
 
 		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeJSON)
+		h.SetUserID(c, userID)
 
 		shortResponse := model.ShortURLResponse{
 			ShortURL: shortURL,

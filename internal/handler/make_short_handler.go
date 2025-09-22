@@ -22,7 +22,7 @@ func (h *Handlers) RegisterMakeShortHandler() {
 		if h.HasValidUserID(c) {
 			userID = h.GetUserID(c)
 		} else {
-			userID = h.GenerateUserId(c)
+			userID = h.GenerateUserID(c)
 		}
 
 		var originalURLConflictError *service.OriginalURLConflictServiceError
