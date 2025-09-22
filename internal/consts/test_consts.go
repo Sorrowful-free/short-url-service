@@ -14,4 +14,8 @@ const (
 	TestShortUID2           = "2345678901"
 	TestDatabaseDSN         = "postgresql://postgres:postgres@localhost:5432?sslmode=disable"
 	TestInvalideDatabaseDSN = "postgresql://postgres:postgres@postgres:4325/short_urls?sslmode=disable"
+	TestUserID              = "1234567890"
+	TestInvalidUserID       = "invalid user ID"
+	TestUserIDLength        = 8
+	TestUserIDCriptoKey     = "supersecretkey"
 )

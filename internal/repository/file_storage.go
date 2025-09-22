@@ -3,6 +3,6 @@ package repository
 import "github.com/Sorrowful-free/short-url-service/internal/model"
 
 type FileStorage interface {
-	SafeAll(shortURLs []model.ShortURLSafeDto) error
-	LoadAll() ([]model.ShortURLSafeDto, error)
+	SafeAll(userShortURLs map[string][]model.ShortURLSafeDto) error
+	LoadAll() (map[string][]model.ShortURLSafeDto, error)
 }

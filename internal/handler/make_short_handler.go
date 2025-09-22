@@ -17,8 +17,16 @@ func (h *Handlers) RegisterMakeShortHandler() {
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
-		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), string(originalURL))
+
+		userID := ""
+		if h.HasValidUserId(c) {
+			userID = h.GetUserId(c)
+		} else {
+			userID = h.GenerateUserId(c)
+		}
+
 		var originalURLConflictError *service.OriginalURLConflictServiceError
+		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), userID, string(originalURL))
 		if err != nil && !errors.As(err, &originalURLConflictError) {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
@@ -29,6 +37,7 @@ func (h *Handlers) RegisterMakeShortHandler() {
 		}
 
 		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeText)
+		h.SetUserId(c, userID)
 
 		if originalURLConflictError != nil {
 			return c.String(http.StatusConflict, shortURL)

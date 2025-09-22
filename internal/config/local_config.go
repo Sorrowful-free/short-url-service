@@ -15,6 +15,8 @@ type LocalConfig struct {
 	FileStoragePath string
 	MigrationsPath  string
 	DatabaseDSN     string
+	UserIDLength    int
+	UserIDCriptoKey string
 }
 
 var localConfig *LocalConfig
@@ -35,6 +37,8 @@ func GetLocalConfig() *LocalConfig {
 	flag.StringVar(&localConfig.FileStoragePath, "f", "", "file storage path")
 	flag.StringVar(&localConfig.MigrationsPath, "m", "file://./migrations", "migrations path")
 	flag.StringVar(&localConfig.DatabaseDSN, "d", "", "postgres DSN")
+	flag.IntVar(&localConfig.UserIDLength, "u", 8, "length of the user ID")
+	flag.StringVar(&localConfig.UserIDCriptoKey, "k", "", "user ID cripto key")
 	flag.Parse()
 
 	//override default values with values from environment variables if they are set
@@ -70,6 +74,20 @@ func GetLocalConfig() *LocalConfig {
 	databaseDSN := os.Getenv("DATABASE_DSN")
 	if databaseDSN != "" {
 		localConfig.DatabaseDSN = databaseDSN
+	}
+
+	userIDLength := os.Getenv("USER_ID_LENGTH")
+	if userIDLength != "" {
+		userIDLengthInt, err := strconv.Atoi(userIDLength)
+		if err != nil {
+			log.Fatalf("invalid USER_ID_LENGTH: %s", err)
+		}
+		localConfig.UserIDLength = userIDLengthInt
+	}
+
+	userIDCriptoKey := os.Getenv("USER_ID_CRIPTO_KEY")
+	if userIDCriptoKey != "" {
+		localConfig.UserIDCriptoKey = userIDCriptoKey
 	}
 
 	return localConfig

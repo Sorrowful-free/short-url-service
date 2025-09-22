@@ -2,46 +2,44 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
 
 type FileStorageShortURLRepository struct {
-	shortURLs   []model.ShortURLSafeDto
+	SimpleShortURLRepository
 	fileStorage FileStorage
 }
 
 func NewFileStorageShortURLRepository(fileStoragePath string) (ShortURLRepository, error) {
 	fileStorage := NewSimpleFileStorage(fileStoragePath)
-	shortURLs, err := fileStorage.LoadAll()
+	userShortURLs, err := fileStorage.LoadAll()
 	if err != nil {
 		return nil, err
 	}
 	return &FileStorageShortURLRepository{
-		shortURLs:   shortURLs,
+		SimpleShortURLRepository: SimpleShortURLRepository{
+			userShortURLs: userShortURLs,
+		},
 		fileStorage: fileStorage,
 	}, nil
 }
 
-func (r *FileStorageShortURLRepository) Save(ctx context.Context, shortURL model.ShortURLDto) error {
+func (r *FileStorageShortURLRepository) Save(ctx context.Context, userID string, shortURL model.ShortURLDto) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
-
-	r.shortURLs = append(r.shortURLs, model.NewShortURLSafeDto(shortURL))
-	r.fileStorage.SafeAll(r.shortURLs)
+	r.SimpleShortURLRepository.Save(ctx, userID, shortURL)
+	r.fileStorage.SafeAll(r.userShortURLs)
 	return nil
 }
 
-func (r *FileStorageShortURLRepository) SaveBatch(ctx context.Context, shortURLs []model.ShortURLDto) error {
+func (r *FileStorageShortURLRepository) SaveBatch(ctx context.Context, userID string, shortURLs []model.ShortURLDto) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
-	for _, shortURL := range shortURLs {
-		r.shortURLs = append(r.shortURLs, model.NewShortURLSafeDto(shortURL))
-	}
-	r.fileStorage.SafeAll(r.shortURLs)
+	r.SimpleShortURLRepository.SaveBatch(ctx, userID, shortURLs)
+	r.fileStorage.SafeAll(r.userShortURLs)
 	return nil
 }
 
@@ -49,24 +47,14 @@ func (r *FileStorageShortURLRepository) ContainsUID(ctx context.Context, shortUI
 	if ctx.Err() != nil {
 		return false
 	}
-	for _, shortURL := range r.shortURLs {
-		if shortURL.ShortUID == shortUID {
-			return true
-		}
-	}
-	return false
+	return r.SimpleShortURLRepository.ContainsUID(ctx, shortUID)
 }
 
 func (r *FileStorageShortURLRepository) GetByUID(ctx context.Context, shortUID string) (model.ShortURLDto, error) {
 	if ctx.Err() != nil {
 		return model.ShortURLDto{}, ctx.Err()
 	}
-	for _, shortURL := range r.shortURLs {
-		if shortURL.ShortUID == shortUID {
-			return model.New(shortURL.ShortUID, shortURL.OriginalURL), nil
-		}
-	}
-	return model.ShortURLDto{}, fmt.Errorf("short url %s not found", shortUID)
+	return r.SimpleShortURLRepository.GetByUID(ctx, shortUID)
 }
 
 func (r *FileStorageShortURLRepository) GetByOriginalURL(ctx context.Context, originalURL string) (model.ShortURLDto, error) {
@@ -74,14 +62,16 @@ func (r *FileStorageShortURLRepository) GetByOriginalURL(ctx context.Context, or
 		return model.ShortURLDto{}, ctx.Err()
 	}
 
-	for _, shortURL := range r.shortURLs {
-		if shortURL.OriginalURL == originalURL {
-			return model.New(shortURL.ShortUID, shortURL.OriginalURL), nil
-		}
-	}
-	return model.ShortURLDto{}, fmt.Errorf("original url %s not found", originalURL)
+	return r.SimpleShortURLRepository.GetByOriginalURL(ctx, originalURL)
 }
 
 func (r *FileStorageShortURLRepository) Ping(ctx context.Context) error {
-	return nil
+	return r.SimpleShortURLRepository.Ping(ctx)
+}
+
+func (r *FileStorageShortURLRepository) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+	return r.SimpleShortURLRepository.GetUserUrls(ctx, userID)
 }

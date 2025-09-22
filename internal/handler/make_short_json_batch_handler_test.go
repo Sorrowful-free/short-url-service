@@ -22,9 +22,13 @@ func TestMakeShortBatchJSONHandler(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		urlService := mocks.NewMockShortURLService(ctrl)
 
-		NewHandlers(e, urlService, consts.TestBaseURL).RegisterHandlers()
+		handlers, err := NewHandlers(e, urlService, consts.TestBaseURL, consts.TestUserIDCriptoKey)
+		if err != nil {
+			t.Fatalf("failed to create handlers: %v", err)
+		}
+		handlers.RegisterHandlers()
 
-		urlService.EXPECT().TryMakeShortBatch(gomock.Any(), gomock.Any()).Return([]string{consts.TestShortURL, consts.TestShortURL2}, nil)
+		urlService.EXPECT().TryMakeShortBatch(gomock.Any(), gomock.Any(), gomock.Any()).Return([]string{consts.TestShortURL, consts.TestShortURL2}, nil)
 
 		originalURL := consts.TestOriginalURL
 		originalURL2 := consts.TestOriginalURL2

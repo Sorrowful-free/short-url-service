@@ -29,11 +29,11 @@ func NewPostgresShortURLRepository(databaseDSN string) (ShortURLRepository, erro
 	}, nil
 }
 
-func (r *PostgresShortURLRepository) Save(ctx context.Context, shortURL model.ShortURLDto) error {
+func (r *PostgresShortURLRepository) Save(ctx context.Context, userID string, shortURL model.ShortURLDto) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
-	_, err := r.db.ExecContext(ctx, "INSERT INTO short_urls (short_uid, original_url) VALUES ($1, $2)", shortURL.ShortUID, shortURL.OriginalURL)
+	_, err := r.db.ExecContext(ctx, "INSERT INTO short_urls (short_uid, original_url, user_id) VALUES ($1, $2, $3)", shortURL.ShortUID, shortURL.OriginalURL, userID)
 	var pgxErr *pgconn.PgError
 	if err != nil {
 		if errors.As(err, &pgxErr) && pgxErr.Code == pgerrcode.UniqueViolation {
@@ -44,7 +44,7 @@ func (r *PostgresShortURLRepository) Save(ctx context.Context, shortURL model.Sh
 	return nil
 }
 
-func (r *PostgresShortURLRepository) SaveBatch(ctx context.Context, shortURLs []model.ShortURLDto) error {
+func (r *PostgresShortURLRepository) SaveBatch(ctx context.Context, userID string, shortURLs []model.ShortURLDto) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
@@ -54,7 +54,7 @@ func (r *PostgresShortURLRepository) SaveBatch(ctx context.Context, shortURLs []
 		return err
 	}
 
-	stmt, err := tx.PrepareContext(ctx, "INSERT INTO short_urls (short_uid, original_url) VALUES ($1, $2)")
+	stmt, err := tx.PrepareContext(ctx, "INSERT INTO short_urls (short_uid, original_url, user_id) VALUES ($1, $2, $3)")
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -62,7 +62,7 @@ func (r *PostgresShortURLRepository) SaveBatch(ctx context.Context, shortURLs []
 	defer stmt.Close()
 
 	for _, shortURL := range shortURLs {
-		_, err := stmt.ExecContext(ctx, shortURL.ShortUID, shortURL.OriginalURL)
+		_, err := stmt.ExecContext(ctx, shortURL.ShortUID, shortURL.OriginalURL, userID)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -127,4 +127,29 @@ func (r *PostgresShortURLRepository) Ping(ctx context.Context) error {
 		return err
 	}
 	return nil
+}
+
+func (r *PostgresShortURLRepository) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+	return nil, nil
+
+	shortURLs := make([]model.ShortURLDto, 0)
+	rows, err := r.db.QueryContext(ctx, "SELECT short_uid, original_url FROM short_urls WHERE user_id = $1", userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var shortUID string
+		var originalURL string
+		err := rows.Scan(&shortUID, &originalURL)
+		if err != nil {
+			return nil, err
+		}
+		shortURLs = append(shortURLs, model.ShortURLDto{ShortUID: shortUID, OriginalURL: originalURL})
+	}
+	return shortURLs, nil
 }

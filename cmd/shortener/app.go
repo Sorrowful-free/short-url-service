@@ -97,7 +97,12 @@ func (a *App) InitHandlers() error {
 	e := echo.New()
 	e.Use(middlewares.LoggerAsMiddleware(a.internalLogger))
 	e.Use(middlewares.GzipMiddleware(a.internalLogger))
-	handlers := handler.NewHandlers(e, a.internalURLService, a.internalConfig.BaseURL)
+	handlers, err := handler.NewHandlers(e, a.internalURLService,
+		a.internalConfig.BaseURL,
+		a.internalConfig.UserIDCriptoKey)
+	if err != nil {
+		return err
+	}
 	handlers.RegisterHandlers()
 	a.internalEcho = e
 	return nil

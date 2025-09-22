@@ -19,9 +19,13 @@ func TestMakeOriginalHandler(t *testing.T) {
 		e := echo.New()
 		ctrl := gomock.NewController(t)
 		urlService := mocks.NewMockShortURLService(ctrl)
-		NewHandlers(e, urlService, consts.TestBaseURL).RegisterHandlers()
+		handlers, err := NewHandlers(e, urlService, consts.TestBaseURL, consts.TestUserIDCriptoKey)
+		if err != nil {
+			t.Fatalf("failed to create handlers: %v", err)
+		}
+		handlers.RegisterHandlers()
 
-		urlService.EXPECT().TryMakeShort(gomock.Any(), gomock.Any()).Return(consts.TestShortURL, nil)
+		urlService.EXPECT().TryMakeShort(gomock.Any(), gomock.Any(), gomock.Any()).Return(consts.TestShortURL, nil)
 		urlService.EXPECT().TryMakeOriginal(gomock.Any(), gomock.Any()).Return(consts.TestOriginalURL, nil)
 		originalURL := consts.TestOriginalURL
 		req := httptest.NewRequest(http.MethodPost, MakeShortPath, bytes.NewBufferString(originalURL))

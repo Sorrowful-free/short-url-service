@@ -33,16 +33,9 @@ func TestSimpleShortURLService(t *testing.T) {
 		assert.NotNil(t, service, "service must be not nil")
 	})
 
-	t.Run("generation of fake uid", func(t *testing.T) {
-
-		uid, err := makeSimpleUIDString(consts.TestUIDLength)
-		assert.NotEmpty(t, uid, "generation of uid must generate some string")
-		assert.NoError(t, err, "generation of uid must complete without any error")
-	})
-
 	t.Run("trying to make short url", func(t *testing.T) {
 
-		tmpShortUID, err := service.TryMakeShort(context.TODO(), originalURL)
+		tmpShortUID, err := service.TryMakeShort(context.TODO(), consts.TestUserID, originalURL)
 		assert.NotEmpty(t, tmpShortUID, "short url must be not empty")
 		assert.NoError(t, err, "short url must generate without any error")
 		shortUID = tmpShortUID

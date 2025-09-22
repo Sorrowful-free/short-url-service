@@ -19,12 +19,19 @@ func (h *Handlers) RegisterMakeShortBatchJSONHandler() {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
+		userID := ""
+		if h.HasValidUserId(c) {
+			userID = h.GetUserId(c)
+		} else {
+			userID = h.GenerateUserId(c)
+		}
+
 		originalURLs := make([]string, len(batchShortURLRequest))
 		for i, request := range batchShortURLRequest {
 			originalURLs[i] = request.OriginalURL
 		}
 
-		shortUIDs, err := h.internalURLService.TryMakeShortBatch(c.Request().Context(), originalURLs)
+		shortUIDs, err := h.internalURLService.TryMakeShortBatch(c.Request().Context(), userID, originalURLs)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}

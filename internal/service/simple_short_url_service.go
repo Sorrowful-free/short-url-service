@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"crypto/rand"
 	"errors"
 	"fmt"
 
+	"github.com/Sorrowful-free/short-url-service/internal/crypto"
 	"github.com/Sorrowful-free/short-url-service/internal/logger"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/Sorrowful-free/short-url-service/internal/repository"
@@ -28,7 +28,7 @@ func NewSimpleService(uidLength int, retryCount int, shortURLRepository reposito
 	return &service, nil
 }
 
-func (service SimpleShortURLService) TryMakeShort(ctx context.Context, originalURL string) (string, error) {
+func (service SimpleShortURLService) TryMakeShort(ctx context.Context, userID string, originalURL string) (string, error) {
 
 	shortUID, err := service.makeSimpleUUIDString(ctx)
 	if err != nil {
@@ -39,7 +39,7 @@ func (service SimpleShortURLService) TryMakeShort(ctx context.Context, originalU
 
 	service.logger.Info("short url created", "shortUID", shortUID, "originalURL", originalURL)
 
-	err = service.ShortURLRepository.Save(ctx, dto)
+	err = service.ShortURLRepository.Save(ctx, userID, dto)
 	if err != nil {
 		var originalURLConflictError *repository.OriginalURLConflictRepositoryError
 		if errors.As(err, &originalURLConflictError) {
@@ -68,7 +68,7 @@ func (service SimpleShortURLService) TryMakeOriginal(ctx context.Context, shortU
 	return dto.OriginalURL, nil
 }
 
-func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, originalURLs []string) ([]string, error) {
+func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, userID string, originalURLs []string) ([]string, error) {
 	shortURLs := make([]model.ShortURLDto, len(originalURLs))
 	shortUIDs := make([]string, len(originalURLs))
 	for i, originalURL := range originalURLs {
@@ -80,7 +80,7 @@ func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, orig
 		shortUIDs[i] = shortUID
 	}
 
-	err := service.ShortURLRepository.SaveBatch(ctx, shortURLs)
+	err := service.ShortURLRepository.SaveBatch(ctx, userID, shortURLs)
 	if err != nil {
 		return nil, err
 	}
@@ -90,16 +90,6 @@ func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, orig
 
 func (service SimpleShortURLService) Ping(ctx context.Context) error {
 	return service.ShortURLRepository.Ping(ctx)
-}
-
-func makeSimpleUIDString(uidLength int) (string, error) {
-	b := make([]byte, uidLength)
-	_, err := rand.Read(b)
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%X", b), nil
 }
 
 func (service SimpleShortURLService) makeSimpleUUIDString(ctx context.Context) (string, error) {
@@ -113,7 +103,7 @@ func (service SimpleShortURLService) makeSimpleUUIDString(ctx context.Context) (
 			return "", fmt.Errorf("failed to make uid: retry count exceeded")
 		}
 
-		shortUID, err = makeSimpleUIDString(service.uidLength)
+		shortUID, err = crypto.GenerateRandomSequenceString(service.uidLength)
 		exist = service.ShortURLRepository.ContainsUID(ctx, shortUID)
 
 		if err != nil {
@@ -122,4 +112,8 @@ func (service SimpleShortURLService) makeSimpleUUIDString(ctx context.Context) (
 	}
 
 	return shortUID, nil
+}
+
+func (service SimpleShortURLService) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
+	return service.ShortURLRepository.GetUserUrls(ctx, userID)
 }
