@@ -140,14 +140,23 @@ func (r *PostgresShortURLRepository) GetUserUrls(ctx context.Context, userID str
 	}
 	defer rows.Close()
 
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	shortURLs := make([]model.ShortURLDto, 0)
 	for rows.Next() {
 		var shortUID string
 		var originalURL string
-		err := rows.Scan(&shortUID, &originalURL)
+		err = rows.Scan(&shortUID, &originalURL)
 		if err != nil {
 			return nil, err
 		}
+
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+
 		shortURLs = append(shortURLs, model.ShortURLDto{ShortUID: shortUID, OriginalURL: originalURL})
 	}
 	return shortURLs, nil
