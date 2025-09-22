@@ -1,2 +1,2 @@
-ALTER TABLE short_urls ADD COLUMN user_id VARCHAR(16) NOT NULL;
+ALTER TABLE short_urls ADD COLUMN user_id VARCHAR(16) NOT NULL DEFAULT '0000000000000000';
 CREATE INDEX idx_user_id ON short_urls(user_id);

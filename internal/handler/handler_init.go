@@ -19,7 +19,7 @@ const (
 	PingDBPath             = "/ping"
 	GetUserPath            = "/api/user/urls"
 
-	FallbackUserID   = "00000000-0000-0000-0000-000000000000"
+	FallbackUserID   = "0000000000000000"
 	UserIDCookieName = "userID"
 )
 
