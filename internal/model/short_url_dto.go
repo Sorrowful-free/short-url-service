@@ -5,7 +5,7 @@ type ShortURLDto struct {
 	OriginalURL string
 }
 
-func New(shortUID string, originalURL string) ShortURLDto {
+func NewShortURLDto(shortUID string, originalURL string) ShortURLDto {
 	return ShortURLDto{
 		ShortUID:    shortUID,
 		OriginalURL: originalURL,

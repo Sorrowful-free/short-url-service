@@ -66,7 +66,7 @@ func (r *SimpleShortURLRepository) GetByUID(ctx context.Context, shortUID string
 	for _, shortURLs := range r.userShortURLs {
 		for _, shortURL := range shortURLs {
 			if shortURL.ShortUID == shortUID {
-				return model.New(shortURL.ShortUID, shortURL.OriginalURL), nil
+				return model.NewShortURLDto(shortURL.ShortUID, shortURL.OriginalURL), nil
 			}
 		}
 	}
@@ -81,7 +81,7 @@ func (r *SimpleShortURLRepository) GetByOriginalURL(ctx context.Context, origina
 	for _, shortURLs := range r.userShortURLs {
 		for _, shortURL := range shortURLs {
 			if shortURL.OriginalURL == originalURL {
-				return model.New(shortURL.ShortUID, shortURL.OriginalURL), nil
+				return model.NewShortURLDto(shortURL.ShortUID, shortURL.OriginalURL), nil
 			}
 		}
 	}
@@ -105,7 +105,7 @@ func (r *SimpleShortURLRepository) GetUserUrls(ctx context.Context, userID strin
 
 	shortURLDtos := make([]model.ShortURLDto, len(shortURLs))
 	for i, shortURL := range shortURLs {
-		shortURLDtos[i] = model.New(shortURL.ShortUID, shortURL.OriginalURL)
+		shortURLDtos[i] = model.NewShortURLDto(shortURL.ShortUID, shortURL.OriginalURL)
 	}
 
 	return shortURLDtos, nil

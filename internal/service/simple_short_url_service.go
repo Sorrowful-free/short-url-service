@@ -35,7 +35,7 @@ func (service SimpleShortURLService) TryMakeShort(ctx context.Context, userID st
 		return "", fmt.Errorf("failed to make uid: %w", err)
 	}
 
-	dto := model.New(shortUID, originalURL)
+	dto := model.NewShortURLDto(shortUID, originalURL)
 
 	service.logger.Info("short url created", "shortUID", shortUID, "originalURL", originalURL)
 
@@ -76,7 +76,7 @@ func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, user
 		if err != nil {
 			return nil, err
 		}
-		shortURLs[i] = model.New(shortUID, originalURL)
+		shortURLs[i] = model.NewShortURLDto(shortUID, originalURL)
 		shortUIDs[i] = shortUID
 	}
 
@@ -92,12 +92,16 @@ func (service SimpleShortURLService) Ping(ctx context.Context) error {
 	return service.ShortURLRepository.Ping(ctx)
 }
 
+func (service SimpleShortURLService) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
+	return service.ShortURLRepository.GetUserUrls(ctx, userID)
+}
+
 func (service SimpleShortURLService) makeSimpleUUIDString(ctx context.Context) (string, error) {
 	shortUID := ""
 	err := error(nil)
 
 	retryCount := service.retryCount
-	for exist := true; exist; retryCount-- { //trying regenerate guid if it wal allready registered
+	for exist := true; exist; retryCount-- { //trying regenerate guid if it was already registered
 
 		if retryCount == 0 {
 			return "", fmt.Errorf("failed to make uid: retry count exceeded")
@@ -112,8 +116,4 @@ func (service SimpleShortURLService) makeSimpleUUIDString(ctx context.Context) (
 	}
 
 	return shortUID, nil
-}
-
-func (service SimpleShortURLService) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
-	return service.ShortURLRepository.GetUserUrls(ctx, userID)
 }
