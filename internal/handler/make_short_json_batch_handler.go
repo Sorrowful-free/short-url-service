@@ -33,8 +33,8 @@ func (h *Handlers) RegisterMakeShortBatchJSONHandler() {
 		}
 
 		batchShortURLResponse := make([]model.BatchShortURLResponseDto, len(shortUIDs))
-		for i, shortUID := range shortUIDs {
-			shortURL, err := url.JoinPath(h.internalBaseURL, shortUID)
+		for i, dto := range shortUIDs {
+			shortURL, err := url.JoinPath(h.internalBaseURL, dto.ShortUID)
 			if err != nil {
 				return c.String(http.StatusInternalServerError, err.Error())
 			}

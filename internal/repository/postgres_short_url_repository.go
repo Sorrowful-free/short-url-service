@@ -93,14 +93,15 @@ func (r *PostgresShortURLRepository) GetByUID(ctx context.Context, shortUID stri
 		return model.ShortURLDto{}, ctx.Err()
 	}
 	var originalURL string
-	row := r.db.QueryRowContext(ctx, "SELECT original_url FROM short_urls WHERE short_uid = $1", shortUID)
+	var isDeleted bool
+	row := r.db.QueryRowContext(ctx, "SELECT original_url, is_deleted FROM short_urls WHERE short_uid = $1", shortUID)
 	if row.Err() != nil {
 		return model.ShortURLDto{}, row.Err()
 	}
 	if err := row.Scan(&originalURL); err != nil {
 		return model.ShortURLDto{}, err
 	}
-	return model.ShortURLDto{ShortUID: shortUID, OriginalURL: originalURL}, nil
+	return model.ShortURLDto{ShortUID: shortUID, OriginalURL: originalURL, IsDeleted: isDeleted}, nil
 }
 
 func (r *PostgresShortURLRepository) GetByOriginalURL(ctx context.Context, originalURL string) (model.ShortURLDto, error) {
@@ -118,23 +119,12 @@ func (r *PostgresShortURLRepository) GetByOriginalURL(ctx context.Context, origi
 	return model.ShortURLDto{ShortUID: shortUID, OriginalURL: originalURL}, nil
 }
 
-func (r *PostgresShortURLRepository) Ping(ctx context.Context) error {
-	if ctx.Err() != nil {
-		return ctx.Err()
-	}
-	err := r.db.PingContext(ctx)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (r *PostgresShortURLRepository) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
 
-	rows, err := r.db.QueryContext(ctx, "SELECT short_uid, original_url FROM short_urls WHERE user_id = $1", userID)
+	rows, err := r.db.QueryContext(ctx, "SELECT short_uid, original_url, is_deleted FROM short_urls WHERE user_id = $1", userID)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +138,8 @@ func (r *PostgresShortURLRepository) GetUserUrls(ctx context.Context, userID str
 	for rows.Next() {
 		var shortUID string
 		var originalURL string
-		err = rows.Scan(&shortUID, &originalURL)
+		var isDeleted bool
+		err = rows.Scan(&shortUID, &originalURL, &isDeleted)
 		if err != nil {
 			return nil, err
 		}
@@ -157,7 +148,29 @@ func (r *PostgresShortURLRepository) GetUserUrls(ctx context.Context, userID str
 			return nil, err
 		}
 
-		shortURLs = append(shortURLs, model.NewShortURLDto(shortUID, originalURL))
+		shortURLs = append(shortURLs, model.NewShortURLDto(shortUID, originalURL, isDeleted))
 	}
 	return shortURLs, nil
+}
+
+func (r *PostgresShortURLRepository) DeleteShortURLs(ctx context.Context, userID string, shortURLs []string) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+	_, err := r.db.ExecContext(ctx, "UPDATE short_urls SET is_deleted = TRUE WHERE user_id = $1 AND short_uid = ANY($2)", userID, shortURLs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *PostgresShortURLRepository) Ping(ctx context.Context) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+	err := r.db.PingContext(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }

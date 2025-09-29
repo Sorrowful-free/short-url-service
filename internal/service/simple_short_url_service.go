@@ -28,14 +28,14 @@ func NewSimpleService(uidLength int, retryCount int, shortURLRepository reposito
 	return &service, nil
 }
 
-func (service SimpleShortURLService) TryMakeShort(ctx context.Context, userID string, originalURL string) (string, error) {
+func (service SimpleShortURLService) TryMakeShort(ctx context.Context, userID string, originalURL string) (model.ShortURLDto, error) {
 
 	shortUID, err := service.makeSimpleUUIDString(ctx)
 	if err != nil {
-		return "", fmt.Errorf("failed to make uid: %w", err)
+		return model.ShortURLDto{}, fmt.Errorf("failed to make uid: %w", err)
 	}
 
-	dto := model.NewShortURLDto(shortUID, originalURL)
+	dto := model.NewShortURLDto(shortUID, originalURL, false)
 
 	service.logger.Info("short url created", "shortUID", shortUID, "originalURL", originalURL)
 
@@ -45,39 +45,37 @@ func (service SimpleShortURLService) TryMakeShort(ctx context.Context, userID st
 		if errors.As(err, &originalURLConflictError) {
 			dto, err = service.ShortURLRepository.GetByOriginalURL(ctx, originalURLConflictError.OriginalURL)
 			if err != nil {
-				return "", fmt.Errorf("failed to get short url by original url: %w", err)
+				return model.ShortURLDto{}, fmt.Errorf("failed to get short url by original url: %w", err)
 			}
-			return dto.ShortUID, NewOriginalURLConflictServiceError(dto.OriginalURL)
+			return dto, NewOriginalURLConflictServiceError(dto.OriginalURL)
 		}
 
-		return "", fmt.Errorf("failed to save short url: %w", err)
+		return model.ShortURLDto{}, fmt.Errorf("failed to save short url: %w", err)
 	}
 
-	return shortUID, nil
+	return dto, nil
 }
 
-func (service SimpleShortURLService) TryMakeOriginal(ctx context.Context, shortUID string) (string, error) {
+func (service SimpleShortURLService) TryMakeOriginal(ctx context.Context, shortUID string) (model.ShortURLDto, error) {
 	dto, err := service.ShortURLRepository.GetByUID(ctx, shortUID)
 
 	if err != nil {
-		return "", fmt.Errorf("short url %s doesnot exist: %w", shortUID, err)
+		return model.ShortURLDto{}, fmt.Errorf("short url %s doesnot exist: %w", shortUID, err)
 	}
 
 	service.logger.Info("original url found", "shortUID", shortUID, "originalURL", dto.OriginalURL)
 
-	return dto.OriginalURL, nil
+	return dto, nil
 }
 
-func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, userID string, originalURLs []string) ([]string, error) {
+func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, userID string, originalURLs []string) ([]model.ShortURLDto, error) {
 	shortURLs := make([]model.ShortURLDto, len(originalURLs))
-	shortUIDs := make([]string, len(originalURLs))
 	for i, originalURL := range originalURLs {
 		shortUID, err := service.makeSimpleUUIDString(ctx)
 		if err != nil {
 			return nil, err
 		}
-		shortURLs[i] = model.NewShortURLDto(shortUID, originalURL)
-		shortUIDs[i] = shortUID
+		shortURLs[i] = model.NewShortURLDto(shortUID, originalURL, false)
 	}
 
 	err := service.ShortURLRepository.SaveBatch(ctx, userID, shortURLs)
@@ -85,15 +83,19 @@ func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, user
 		return nil, err
 	}
 
-	return shortUIDs, nil
-}
-
-func (service SimpleShortURLService) Ping(ctx context.Context) error {
-	return service.ShortURLRepository.Ping(ctx)
+	return shortURLs, nil
 }
 
 func (service SimpleShortURLService) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
 	return service.ShortURLRepository.GetUserUrls(ctx, userID)
+}
+
+func (service SimpleShortURLService) DeleteShortURLs(ctx context.Context, userID string, shortURLs []string) error {
+	return service.ShortURLRepository.DeleteShortURLs(ctx, userID, shortURLs)
+}
+
+func (service SimpleShortURLService) Ping(ctx context.Context) error {
+	return service.ShortURLRepository.Ping(ctx)
 }
 
 func (service SimpleShortURLService) makeSimpleUUIDString(ctx context.Context) (string, error) {

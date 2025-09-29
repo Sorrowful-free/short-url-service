@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
@@ -66,7 +67,7 @@ func (r *SimpleShortURLRepository) GetByUID(ctx context.Context, shortUID string
 	for _, shortURLs := range r.userShortURLs {
 		for _, shortURL := range shortURLs {
 			if shortURL.ShortUID == shortUID {
-				return model.NewShortURLDto(shortURL.ShortUID, shortURL.OriginalURL), nil
+				return model.NewShortURLDto(shortURL.ShortUID, shortURL.OriginalURL, shortURL.IsDeleted), nil
 			}
 		}
 	}
@@ -81,15 +82,11 @@ func (r *SimpleShortURLRepository) GetByOriginalURL(ctx context.Context, origina
 	for _, shortURLs := range r.userShortURLs {
 		for _, shortURL := range shortURLs {
 			if shortURL.OriginalURL == originalURL {
-				return model.NewShortURLDto(shortURL.ShortUID, shortURL.OriginalURL), nil
+				return model.NewShortURLDto(shortURL.ShortUID, shortURL.OriginalURL, shortURL.IsDeleted), nil
 			}
 		}
 	}
 	return model.ShortURLDto{}, fmt.Errorf("original url %s not found", originalURL)
-}
-
-func (r *SimpleShortURLRepository) Ping(ctx context.Context) error {
-	return nil
 }
 
 func (r *SimpleShortURLRepository) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
@@ -105,8 +102,33 @@ func (r *SimpleShortURLRepository) GetUserUrls(ctx context.Context, userID strin
 
 	shortURLDtos := make([]model.ShortURLDto, len(shortURLs))
 	for i, shortURL := range shortURLs {
-		shortURLDtos[i] = model.NewShortURLDto(shortURL.ShortUID, shortURL.OriginalURL)
+		shortURLDtos[i] = model.NewShortURLDto(shortURL.ShortUID, shortURL.OriginalURL, shortURL.IsDeleted)
 	}
 
 	return shortURLDtos, nil
+}
+
+func (r *SimpleShortURLRepository) DeleteShortURLs(ctx context.Context, userID string, shortURLs []string) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
+	userShortURLs, ok := r.userShortURLs[userID]
+	if !ok {
+		return fmt.Errorf("user %s not found", userID)
+	}
+
+	for _, userShortUrl := range userShortURLs {
+		if slices.Contains(shortURLs, userShortUrl.ShortUID) {
+			userShortUrl.IsDeleted = true
+		}
+	}
+
+	r.userShortURLs[userID] = userShortURLs
+
+	return nil
+}
+
+func (r *SimpleShortURLRepository) Ping(ctx context.Context) error {
+	return nil
 }

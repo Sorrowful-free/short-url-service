@@ -25,13 +25,13 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 
 		userID := middlewares.TryGetUserID(c)
 
-		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), userID, shortRequest.OriginalURL)
+		dto, err := h.internalURLService.TryMakeShort(c.Request().Context(), userID, shortRequest.OriginalURL)
 		var originalURLConflictError *service.OriginalURLConflictServiceError
 		if err != nil && !errors.As(err, &originalURLConflictError) {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
-		shortURL, err := url.JoinPath(h.internalBaseURL, shortUID)
+		shortURL, err := url.JoinPath(h.internalBaseURL, dto.ShortUID)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}

@@ -13,6 +13,7 @@ const (
 	OriginalPathParam      = "id"
 	PingDBPath             = "/ping"
 	GetUserURLsPath        = "/api/user/urls"
+	DeleteUserURLsPath     = "/api/user/urls"
 )
 
 type Handlers struct {

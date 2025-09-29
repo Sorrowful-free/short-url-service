@@ -22,12 +22,12 @@ func (h *Handlers) RegisterMakeShortHandler() {
 		userID := middlewares.TryGetUserID(c)
 
 		var originalURLConflictError *service.OriginalURLConflictServiceError
-		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), userID, string(originalURL))
+		dto, err := h.internalURLService.TryMakeShort(c.Request().Context(), userID, string(originalURL))
 		if err != nil && !errors.As(err, &originalURLConflictError) {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
-		shortURL, err := url.JoinPath(h.internalBaseURL, shortUID)
+		shortURL, err := url.JoinPath(h.internalBaseURL, dto.ShortUID)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}

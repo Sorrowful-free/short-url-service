@@ -13,5 +13,6 @@ type ShortURLRepository interface {
 	GetByUID(ctx context.Context, shortUID string) (model.ShortURLDto, error)
 	GetByOriginalURL(ctx context.Context, originalURL string) (model.ShortURLDto, error)
 	GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error)
+	DeleteShortURLs(ctx context.Context, userID string, shortURLs []string) error
 	Ping(ctx context.Context) error
 }
