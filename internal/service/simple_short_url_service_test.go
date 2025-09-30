@@ -38,7 +38,7 @@ func TestSimpleShortURLService(t *testing.T) {
 		tmpShortUID, err := service.TryMakeShort(context.TODO(), consts.TestUserID, originalURL)
 		assert.NotEmpty(t, tmpShortUID, "short url must be not empty")
 		assert.NoError(t, err, "short url must generate without any error")
-		shortUID = tmpShortUID
+		shortUID = tmpShortUID.ShortUID
 	})
 
 	t.Run("trying to make original url", func(t *testing.T) {
