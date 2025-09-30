@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
+	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/Sorrowful-free/short-url-service/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
@@ -20,9 +21,13 @@ func TestMakeShortHandler(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		urlService := mocks.NewMockShortURLService(ctrl)
 
-		NewHandlers(e, urlService, consts.TestBaseURL).RegisterHandlers()
+		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService)
+		if err != nil {
+			t.Fatalf("failed to create handlers: %v", err)
+		}
+		handlers.RegisterHandlers()
 
-		urlService.EXPECT().TryMakeShort(gomock.Any(), gomock.Any()).Return(consts.TestShortURL, nil)
+		urlService.EXPECT().TryMakeShort(gomock.Any(), gomock.Any(), gomock.Any()).Return(model.NewShortURLDto(consts.TestShortURL, consts.TestOriginalURL, false), nil)
 
 		originalURL := consts.TestOriginalURL
 		req := httptest.NewRequest(http.MethodPost, MakeShortPath, bytes.NewBufferString(originalURL))

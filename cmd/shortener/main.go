@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	var db *sql.DB //workaraund for autotests
+	var db *sql.DB //workaround for autotests
 	app := NewApp(context.Background())
 	if err := app.Init(); err != nil {
 		log.Fatal(err)
@@ -15,5 +15,5 @@ func main() {
 	if err := app.Run(); err != nil {
 		log.Fatal(err)
 	}
-	db.Close() //workaraund for autotests
+	db.Close() //workaround for autotests
 }

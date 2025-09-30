@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
+	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
 	"github.com/labstack/echo/v4"
 )
@@ -17,13 +18,16 @@ func (h *Handlers) RegisterMakeShortHandler() {
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
-		shortUID, err := h.internalURLService.TryMakeShort(c.Request().Context(), string(originalURL))
+
+		userID := middlewares.TryGetUserID(c)
+
 		var originalURLConflictError *service.OriginalURLConflictServiceError
+		dto, err := h.internalURLService.TryMakeShort(c.Request().Context(), userID, string(originalURL))
 		if err != nil && !errors.As(err, &originalURLConflictError) {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
-		shortURL, err := url.JoinPath(h.internalBaseURL, shortUID)
+		shortURL, err := url.JoinPath(h.internalBaseURL, dto.ShortUID)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}

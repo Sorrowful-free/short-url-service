@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/Sorrowful-free/short-url-service/internal/config"
+	"github.com/Sorrowful-free/short-url-service/internal/crypto"
 	"github.com/Sorrowful-free/short-url-service/internal/handler"
 	"github.com/Sorrowful-free/short-url-service/internal/logger"
 	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
@@ -17,10 +18,11 @@ import (
 )
 
 type App struct {
-	internalContext context.Context
-	internalConfig  *config.LocalConfig
-	internalLogger  logger.Logger
-	internalEcho    *echo.Echo
+	internalContext         context.Context
+	internalConfig          *config.LocalConfig
+	internalLogger          logger.Logger
+	internalUserIDEncryptor crypto.UserIDEncryptor
+	internalEcho            *echo.Echo
 
 	internalURLRepository repository.ShortURLRepository
 	internalURLService    service.ShortURLService
@@ -43,6 +45,15 @@ func (a *App) InitLogger() error {
 
 func (a *App) InitConfig() error {
 	a.internalConfig = config.GetLocalConfig()
+	return nil
+}
+
+func (a *App) InitUserIDEncryptor() error {
+	userIDEncryptor, err := crypto.NewSha256UserIDEncryptor(a.internalConfig.UserIDCriptoKey)
+	if err != nil {
+		return err
+	}
+	a.internalUserIDEncryptor = userIDEncryptor
 	return nil
 }
 
@@ -96,8 +107,12 @@ func (a *App) InitURLService() error {
 func (a *App) InitHandlers() error {
 	e := echo.New()
 	e.Use(middlewares.LoggerAsMiddleware(a.internalLogger))
+	e.Use(middlewares.SimpleAuthMiddleware(a.internalUserIDEncryptor))
 	e.Use(middlewares.GzipMiddleware(a.internalLogger))
-	handlers := handler.NewHandlers(e, a.internalURLService, a.internalConfig.BaseURL)
+	handlers, err := handler.NewHandlers(e, a.internalConfig.BaseURL, a.internalURLService)
+	if err != nil {
+		return err
+	}
 	handlers.RegisterHandlers()
 	a.internalEcho = e
 	return nil
@@ -108,6 +123,9 @@ func (a *App) Init() error {
 		return err
 	}
 	if err := a.InitConfig(); err != nil {
+		return err
+	}
+	if err := a.InitUserIDEncryptor(); err != nil {
 		return err
 	}
 	if err := a.InitMigration(); err != nil {

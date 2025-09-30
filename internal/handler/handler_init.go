@@ -12,20 +12,23 @@ const (
 	MakeOriginalPath       = "/:id"
 	OriginalPathParam      = "id"
 	PingDBPath             = "/ping"
+	GetUserURLsPath        = "/api/user/urls"
+	DeleteUserURLsPath     = "/api/user/urls"
 )
 
 type Handlers struct {
 	internalEcho       *echo.Echo
-	internalURLService service.ShortURLService
 	internalBaseURL    string
+	internalURLService service.ShortURLService
 }
 
-func NewHandlers(echo *echo.Echo, urlService service.ShortURLService, baseURL string) *Handlers {
+func NewHandlers(echo *echo.Echo, baseURL string, urlService service.ShortURLService) (*Handlers, error) {
+
 	return &Handlers{
 		internalEcho:       echo,
-		internalURLService: urlService,
 		internalBaseURL:    baseURL,
-	}
+		internalURLService: urlService,
+	}, nil
 }
 
 func (h *Handlers) RegisterHandlers() *Handlers {
@@ -33,6 +36,8 @@ func (h *Handlers) RegisterHandlers() *Handlers {
 	h.RegisterMakeOriginalHandler()
 	h.RegisterMakeShortJSONHandler()
 	h.RegisterMakeShortBatchJSONHandler()
+	h.RegisterGetUserUrlsHandler()
+	h.RegisterDeleteUserURLsHandler()
 	h.RegisterPingDBHandler()
 	return h
 }

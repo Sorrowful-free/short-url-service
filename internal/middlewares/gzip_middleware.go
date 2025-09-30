@@ -17,7 +17,7 @@ func GzipMiddleware(logger logger.Logger) echo.MiddlewareFunc {
 			contentEncoding := c.Request().Header.Get(consts.HeaderContentEncoding)
 			isGzipRequested := strings.Contains(contentEncoding, consts.HeaderEncodingGzip)
 
-			if isGzipRequested {
+			if isGzipRequested && c.Request().Body != nil {
 				gzr, err := compression.NewGzipRequestReader(c.Request())
 				if err != nil {
 					return c.String(http.StatusInternalServerError, err.Error())
@@ -32,7 +32,7 @@ func GzipMiddleware(logger logger.Logger) echo.MiddlewareFunc {
 			contentType := c.Response().Header().Get(consts.HeaderContentType)
 			isAcceptedContent := acceptContentType(contentType)
 
-			if isGzipAccepted && isAcceptedContent {
+			if isGzipAccepted && isAcceptedContent && c.Response().Writer != nil {
 				c.Response().Header().Set(consts.HeaderContentEncoding, consts.HeaderEncodingGzip)
 				gzw := compression.NewGzipResponseWriter(c.Response())
 				defer gzw.Close()

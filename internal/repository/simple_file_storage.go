@@ -17,33 +17,33 @@ func NewSimpleFileStorage(fileStoragePath string) *SimpleFileStorage {
 	}
 }
 
-func (sfs *SimpleFileStorage) SafeAll(shortURLs []model.ShortURLSafeDto) error {
+func (sfs *SimpleFileStorage) SaveAll(userShortURLs map[string][]model.ShortURLSafeDto) error {
 	jsonFile, err := os.Create(sfs.fileStoragePath)
 	if err != nil {
 		return err
 	}
 	defer jsonFile.Close()
 
-	err = json.NewEncoder(jsonFile).Encode(shortURLs)
+	err = json.NewEncoder(jsonFile).Encode(userShortURLs)
 	return err
 }
 
-func (sfs *SimpleFileStorage) LoadAll() ([]model.ShortURLSafeDto, error) {
-	shortURLs := make([]model.ShortURLSafeDto, 0)
+func (sfs *SimpleFileStorage) LoadAll() (map[string][]model.ShortURLSafeDto, error) {
+	userShortURLs := make(map[string][]model.ShortURLSafeDto)
 
 	jsonFile, err := os.Open(sfs.fileStoragePath)
 
 	//if file doesn't exist we must run app anyway but return empty list
 	if os.IsNotExist(err) {
-		return shortURLs, nil
+		return userShortURLs, nil
 	} else if err != nil {
 		return nil, err
 	}
 	defer jsonFile.Close()
 
-	err = json.NewDecoder(jsonFile).Decode(&shortURLs)
+	err = json.NewDecoder(jsonFile).Decode(&userShortURLs)
 	if err != nil {
 		return nil, err
 	}
-	return shortURLs, nil
+	return userShortURLs, nil
 }

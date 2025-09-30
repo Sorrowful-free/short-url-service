@@ -10,13 +10,18 @@ import (
 func (h *Handlers) RegisterMakeOriginalHandler() {
 	h.internalEcho.GET(MakeOriginalPath, func(c echo.Context) error {
 		shortUID := c.Param(OriginalPathParam)
-		originalURL, err := h.internalURLService.TryMakeOriginal(c.Request().Context(), shortUID)
+		dto, err := h.internalURLService.TryMakeOriginal(c.Request().Context(), shortUID)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
-		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeText)
-		c.Response().Header().Set(consts.HeaderLocation, originalURL)
 
-		return c.Redirect(http.StatusTemporaryRedirect, originalURL)
+		if dto.IsDeleted {
+			return c.String(http.StatusGone, "short url is deleted")
+		}
+
+		c.Response().Header().Set(consts.HeaderContentType, consts.HeaderContentTypeText)
+		c.Response().Header().Set(consts.HeaderLocation, dto.OriginalURL)
+
+		return c.Redirect(http.StatusTemporaryRedirect, dto.OriginalURL)
 	})
 }

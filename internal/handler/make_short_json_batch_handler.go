@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/labstack/echo/v4"
 )
@@ -24,14 +25,16 @@ func (h *Handlers) RegisterMakeShortBatchJSONHandler() {
 			originalURLs[i] = request.OriginalURL
 		}
 
-		shortUIDs, err := h.internalURLService.TryMakeShortBatch(c.Request().Context(), originalURLs)
+		userID := middlewares.TryGetUserID(c)
+
+		shortUIDs, err := h.internalURLService.TryMakeShortBatch(c.Request().Context(), userID, originalURLs)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
 		batchShortURLResponse := make([]model.BatchShortURLResponseDto, len(shortUIDs))
-		for i, shortUID := range shortUIDs {
-			shortURL, err := url.JoinPath(h.internalBaseURL, shortUID)
+		for i, dto := range shortUIDs {
+			shortURL, err := url.JoinPath(h.internalBaseURL, dto.ShortUID)
 			if err != nil {
 				return c.String(http.StatusInternalServerError, err.Error())
 			}
@@ -40,7 +43,6 @@ func (h *Handlers) RegisterMakeShortBatchJSONHandler() {
 				ShortURL:      shortURL,
 			}
 		}
-
 		return c.JSON(http.StatusCreated, batchShortURLResponse)
 	})
 }
