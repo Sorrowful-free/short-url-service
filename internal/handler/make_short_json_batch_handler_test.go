@@ -28,7 +28,7 @@ func TestMakeShortBatchJSONHandler(t *testing.T) {
 		}
 		handlers.RegisterHandlers()
 
-		urlService.EXPECT().TryMakeShortBatch(gomock.Any(), gomock.Any(), gomock.Any()).Return([]string{consts.TestShortURL, consts.TestShortURL2}, nil)
+		urlService.EXPECT().TryMakeShortBatch(gomock.Any(), gomock.Any(), gomock.Any()).Return([]model.ShortURLDto{model.NewShortURLDto(consts.TestShortURL, consts.TestOriginalURL, false), model.NewShortURLDto(consts.TestShortURL2, consts.TestOriginalURL2, false)}, nil)
 
 		originalURL := consts.TestOriginalURL
 		originalURL2 := consts.TestOriginalURL2

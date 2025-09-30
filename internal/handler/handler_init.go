@@ -37,6 +37,7 @@ func (h *Handlers) RegisterHandlers() *Handlers {
 	h.RegisterMakeShortJSONHandler()
 	h.RegisterMakeShortBatchJSONHandler()
 	h.RegisterGetUserUrlsHandler()
+	h.RegisterDeleteUserURLsHandler()
 	h.RegisterPingDBHandler()
 	return h
 }

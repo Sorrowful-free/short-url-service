@@ -28,7 +28,7 @@ func TestMakeShortJSONHandler(t *testing.T) {
 		}
 		handlers.RegisterHandlers()
 
-		urlService.EXPECT().TryMakeShort(gomock.Any(), gomock.Any(), gomock.Any()).Return(consts.TestShortURL, nil)
+		urlService.EXPECT().TryMakeShort(gomock.Any(), gomock.Any(), gomock.Any()).Return(model.NewShortURLDto(consts.TestShortURL, consts.TestOriginalURL, false), nil)
 
 		originalURL := consts.TestOriginalURL
 		shortRequest := model.ShortURLRequest{

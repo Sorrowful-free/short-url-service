@@ -46,6 +46,6 @@ func TestSimpleShortURLService(t *testing.T) {
 		tmpOriginalURL, err := service.TryMakeOriginal(context.TODO(), shortUID)
 		assert.NotEmpty(t, tmpOriginalURL, "original url must be not empty")
 		assert.NoError(t, err, "original url must generate without any error")
-		assert.Equal(t, originalURL, tmpOriginalURL, "service must return the same url")
+		assert.Equal(t, originalURL, tmpOriginalURL.OriginalURL, "service must return the same url")
 	})
 }
