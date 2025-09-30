@@ -118,10 +118,8 @@ func (r *SimpleShortURLRepository) DeleteShortURLs(ctx context.Context, userID s
 		return fmt.Errorf("user %s not found", userID)
 	}
 
-	for _, userShortUrl := range userShortURLs {
-		if slices.Contains(shortURLs, userShortUrl.ShortUID) {
-			userShortUrl.IsDeleted = true
-		}
+	for index, userShortUrl := range userShortURLs {
+		userShortURLs[index].IsDeleted = slices.Contains(shortURLs, userShortUrl.ShortUID)
 	}
 
 	r.userShortURLs[userID] = userShortURLs
