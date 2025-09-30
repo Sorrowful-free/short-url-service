@@ -30,7 +30,7 @@ func (r *FileStorageShortURLRepository) Save(ctx context.Context, userID string,
 		return ctx.Err()
 	}
 	r.SimpleShortURLRepository.Save(ctx, userID, shortURL)
-	r.fileStorage.SafeAll(r.userShortURLs)
+	r.fileStorage.SaveAll(r.userShortURLs)
 	return nil
 }
 
@@ -39,7 +39,7 @@ func (r *FileStorageShortURLRepository) SaveBatch(ctx context.Context, userID st
 		return ctx.Err()
 	}
 	r.SimpleShortURLRepository.SaveBatch(ctx, userID, shortURLs)
-	r.fileStorage.SafeAll(r.userShortURLs)
+	r.fileStorage.SaveAll(r.userShortURLs)
 	return nil
 }
 
