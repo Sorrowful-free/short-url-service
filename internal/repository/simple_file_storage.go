@@ -17,7 +17,7 @@ func NewSimpleFileStorage(fileStoragePath string) *SimpleFileStorage {
 	}
 }
 
-func (sfs *SimpleFileStorage) SafeAll(userShortURLs map[string][]model.ShortURLSafeDto) error {
+func (sfs *SimpleFileStorage) SaveAll(userShortURLs map[string][]model.ShortURLSafeDto) error {
 	jsonFile, err := os.Create(sfs.fileStoragePath)
 	if err != nil {
 		return err
