@@ -70,10 +70,10 @@ func AuditToURL(url string, action AuditAction) echo.HandlerFunc {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 		resp, err := http.Post(url, "application/json", bytes.NewBuffer(auditEventJSON))
-		defer resp.Body.Close()
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
+		resp.Body.Close()
 		return nil
 	}
 }
