@@ -47,5 +47,5 @@ func (h *Handlers) RegisterMakeShortJSONHandler() {
 		}
 
 		return c.JSON(http.StatusCreated, shortResponse)
-	})
+	}, middlewares.AuditMiddleWare(h.internalConfig, middlewares.AuditShorten))
 }

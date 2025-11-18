@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Sorrowful-free/short-url-service/internal/config"
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 	"github.com/Sorrowful-free/short-url-service/mocks"
@@ -21,7 +22,8 @@ func TestMakeShortHandler(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		urlService := mocks.NewMockShortURLService(ctrl)
 
-		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService)
+		config := config.GetLocalConfig()
+		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService, config)
 		if err != nil {
 			t.Fatalf("failed to create handlers: %v", err)
 		}

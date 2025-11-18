@@ -39,5 +39,5 @@ func (h *Handlers) RegisterMakeShortHandler() {
 		}
 
 		return c.String(http.StatusCreated, shortURL)
-	})
+	}, middlewares.AuditMiddleWare(h.internalConfig, middlewares.AuditShorten))
 }

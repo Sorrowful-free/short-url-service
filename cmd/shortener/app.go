@@ -109,7 +109,7 @@ func (a *App) InitHandlers() error {
 	e.Use(middlewares.LoggerAsMiddleware(a.internalLogger))
 	e.Use(middlewares.SimpleAuthMiddleware(a.internalUserIDEncryptor))
 	e.Use(middlewares.GzipMiddleware(a.internalLogger))
-	handlers, err := handler.NewHandlers(e, a.internalConfig.BaseURL, a.internalURLService)
+	handlers, err := handler.NewHandlers(e, a.internalConfig.BaseURL, a.internalURLService, a.internalConfig)
 	if err != nil {
 		return err
 	}

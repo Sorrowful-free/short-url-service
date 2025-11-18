@@ -17,6 +17,9 @@ type LocalConfig struct {
 	DatabaseDSN     string
 	UserIDLength    int
 	UserIDCriptoKey string
+
+	AuditFilePath string
+	AuditURL      string
 }
 
 var localConfig *LocalConfig
@@ -39,6 +42,8 @@ func GetLocalConfig() *LocalConfig {
 	flag.StringVar(&localConfig.DatabaseDSN, "d", "", "postgres DSN")
 	flag.IntVar(&localConfig.UserIDLength, "u", 8, "length of the user ID")
 	flag.StringVar(&localConfig.UserIDCriptoKey, "k", "", "user ID cripto key")
+	flag.StringVar(&localConfig.AuditFilePath, "audit-file", "", "audit file path")
+	flag.StringVar(&localConfig.AuditURL, "audit-url", "", "audit URL")
 	flag.Parse()
 
 	//override default values with values from environment variables if they are set
@@ -90,6 +95,16 @@ func GetLocalConfig() *LocalConfig {
 		localConfig.UserIDCriptoKey = userIDCriptoKey
 	}
 
+	auditFilePath := os.Getenv("AUDIT_FILE")
+	if auditFilePath != "" {
+		localConfig.AuditFilePath = auditFilePath
+	}
+
+	auditURL := os.Getenv("AUDIT_URL")
+	if auditURL != "" {
+		localConfig.AuditURL = auditURL
+	}
+
 	return localConfig
 }
 
@@ -99,4 +114,18 @@ func (c *LocalConfig) HasFileStoragePath() bool {
 
 func (c *LocalConfig) HasDatabaseDSN() bool {
 	return c.DatabaseDSN != ""
+}
+
+func (c *LocalConfig) HasAuditFilePath() bool {
+	if c == nil {
+		return false
+	}
+	return c.AuditFilePath != ""
+}
+
+func (c *LocalConfig) HasAuditURL() bool {
+	if c == nil {
+		return false
+	}
+	return c.AuditURL != ""
 }

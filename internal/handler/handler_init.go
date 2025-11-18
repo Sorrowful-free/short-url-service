@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/Sorrowful-free/short-url-service/internal/config"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
 	"github.com/labstack/echo/v4"
 )
@@ -20,9 +21,10 @@ type Handlers struct {
 	internalEcho       *echo.Echo
 	internalBaseURL    string
 	internalURLService service.ShortURLService
+	internalConfig     *config.LocalConfig
 }
 
-func NewHandlers(echo *echo.Echo, baseURL string, urlService service.ShortURLService) (*Handlers, error) {
+func NewHandlers(echo *echo.Echo, baseURL string, urlService service.ShortURLService, config *config.LocalConfig) (*Handlers, error) {
 
 	return &Handlers{
 		internalEcho:       echo,

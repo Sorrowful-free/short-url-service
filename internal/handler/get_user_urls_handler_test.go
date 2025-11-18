@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Sorrowful-free/short-url-service/internal/config"
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
 	"github.com/Sorrowful-free/short-url-service/internal/crypto"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
@@ -25,7 +26,8 @@ func TestGetUserUrlsHandler(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to create user ID encryptor: %v", err)
 		}
-		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService)
+		config := config.GetLocalConfig()
+		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService, config)
 		if err != nil {
 			t.Fatalf("failed to create handlers: %v", err)
 		}
@@ -59,7 +61,8 @@ func TestGetUserUrlsHandler(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to create user ID encryptor: %v", err)
 		}
-		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService)
+		config := config.GetLocalConfig()
+		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService, config)
 		if err != nil {
 			t.Fatalf("failed to create handlers: %v", err)
 		}
