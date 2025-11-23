@@ -39,6 +39,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install mockgen
+        run: |
+          go install github.com/golang/mock/mockgen@latest
+
+      - name: Generate mocks
+        run: |
+          make gen_mocks
+
       - name: Install PostgreSQL client
         run: apt-get update && apt-get install -y postgresql-client
 
@@ -61,14 +69,6 @@ jobs:
           mv $GITHUB_WORKSPACE/.tools/shortenertest_v2 /usr/local/bin/shortenertest
           mv $GITHUB_WORKSPACE/.tools/random /usr/local/bin/random
           mv $GITHUB_WORKSPACE/.tools/wipedb /usr/local/bin/wipedb
-
-      - name: Install mockgen
-        run: |
-          go install github.com/golang/mock/mockgen@latest
-
-      - name: Generate mocks
-        run: |
-          make gen_mocks
 
       - name: Setup go deps
         run: |
