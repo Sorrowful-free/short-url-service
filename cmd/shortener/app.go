@@ -128,8 +128,11 @@ func (a *App) Init() error {
 	if err := a.InitUserIDEncryptor(); err != nil {
 		return err
 	}
-	if err := a.InitMigration(); err != nil {
-		return err
+
+	if !a.internalConfig.SkipMigrations {
+		if err := a.InitMigration(); err != nil {
+			return err
+		}
 	}
 	if err := a.InitURLRepository(); err != nil {
 		return err
