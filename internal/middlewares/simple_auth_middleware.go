@@ -85,6 +85,16 @@ func SetUserID(c echo.Context, userID string, userIDEncryptor crypto.UserIDEncry
 		return
 	}
 
+	cookies := c.Request().Cookies()
+	for _, cookie := range cookies {
+		if cookie.Name == consts.UserIDCookieName {
+			if cookie.Value == encryptedUserID {
+				return
+			}
+			break
+		}
+	}
+
 	c.SetCookie(&http.Cookie{
 		Name:  consts.UserIDCookieName,
 		Value: encryptedUserID,

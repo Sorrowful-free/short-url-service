@@ -1,6 +1,9 @@
 package main
 
 import (
+	"net/http"
+	_ "net/http/pprof"
+
 	_ "github.com/golang-migrate/migrate/database/postgres"
 	_ "github.com/golang-migrate/migrate/source/file"
 
@@ -147,5 +150,13 @@ func (a *App) Init() error {
 }
 
 func (a *App) Run() error {
+	go func() {
+		pprofAddr := "localhost:6060"
+		a.internalLogger.Info("Starting pprof server on " + pprofAddr)
+		if err := http.ListenAndServe(pprofAddr, nil); err != nil {
+			a.internalLogger.Error("pprof server error: " + err.Error())
+		}
+	}()
+
 	return a.internalEcho.Start(a.internalConfig.ListenAddr)
 }
