@@ -44,7 +44,7 @@ jobs:
 
       - name: Apply up migrations
         run: |
-          make migrate-up DB_URI="postgresql://postgres:postgres@postgres/praktikum?sslmode=disable"
+          make migrate-up DB_URI="postgres://postgres:postgres@postgres:5432/praktikum?sslmode=disable"
 
       - name: Download autotests binaries
         uses: robinraju/release-downloader@v1.8
