@@ -1,13 +1,10 @@
 package main
 
 import (
-	_ "net/http/pprof"
-
 	_ "github.com/golang-migrate/migrate/database/postgres"
 	_ "github.com/golang-migrate/migrate/source/file"
 
 	"context"
-	"net/http"
 
 	"github.com/Sorrowful-free/short-url-service/internal/config"
 	"github.com/Sorrowful-free/short-url-service/internal/crypto"
@@ -16,6 +13,7 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/Sorrowful-free/short-url-service/internal/repository"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
+	"github.com/golang-migrate/migrate"
 	"github.com/labstack/echo/v4"
 )
 
@@ -56,6 +54,23 @@ func (a *App) InitUserIDEncryptor() error {
 		return err
 	}
 	a.internalUserIDEncryptor = userIDEncryptor
+	return nil
+}
+
+func (a *App) InitMigration() error {
+
+	//if database DSN is not set, we don't need to run migrations
+	if !a.internalConfig.HasDatabaseDSN() {
+		return nil
+	}
+	m, err := migrate.New(a.internalConfig.MigrationsPath, a.internalConfig.DatabaseDSN)
+	if err != nil {
+		return err
+	}
+	err = m.Up()
+	if err != nil && err != migrate.ErrNoChange {
+		return err
+	}
 	return nil
 }
 
@@ -113,6 +128,9 @@ func (a *App) Init() error {
 	if err := a.InitUserIDEncryptor(); err != nil {
 		return err
 	}
+	if err := a.InitMigration(); err != nil {
+		return err
+	}
 	if err := a.InitURLRepository(); err != nil {
 		return err
 	}
@@ -126,14 +144,5 @@ func (a *App) Init() error {
 }
 
 func (a *App) Run() error {
-	// Start pprof server in a separate goroutine
-	go func() {
-		pprofAddr := "localhost:6060"
-		a.internalLogger.Info("Starting pprof server on " + pprofAddr)
-		if err := http.ListenAndServe(pprofAddr, nil); err != nil {
-			a.internalLogger.Error("pprof server error: " + err.Error())
-		}
-	}()
-
 	return a.internalEcho.Start(a.internalConfig.ListenAddr)
 }

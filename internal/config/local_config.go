@@ -13,6 +13,7 @@ type LocalConfig struct {
 	UIDLength       int
 	UIDRetryCount   int
 	FileStoragePath string
+	MigrationsPath  string
 	DatabaseDSN     string
 	UserIDLength    int
 	UserIDCriptoKey string
@@ -37,6 +38,7 @@ func GetLocalConfig() *LocalConfig {
 	flag.IntVar(&localConfig.UIDLength, "l", 8, "length of the short URL")
 	flag.IntVar(&localConfig.UIDRetryCount, "r", 10, "retry count for the short URL")
 	flag.StringVar(&localConfig.FileStoragePath, "f", "", "file storage path")
+	flag.StringVar(&localConfig.MigrationsPath, "m", "file://./migrations", "migrations path")
 	flag.StringVar(&localConfig.DatabaseDSN, "d", "", "postgres DSN")
 	flag.IntVar(&localConfig.UserIDLength, "u", 8, "length of the user ID")
 	flag.StringVar(&localConfig.UserIDCriptoKey, "k", "", "user ID cripto key")
@@ -67,6 +69,11 @@ func GetLocalConfig() *LocalConfig {
 	fileStoragePath := os.Getenv("FILE_STORAGE_PATH")
 	if fileStoragePath != "" {
 		localConfig.FileStoragePath = fileStoragePath
+	}
+
+	migrationsPath := os.Getenv("MIGRATIONS_PATH")
+	if migrationsPath != "" {
+		localConfig.MigrationsPath = migrationsPath
 	}
 
 	databaseDSN := os.Getenv("DATABASE_DSN")
