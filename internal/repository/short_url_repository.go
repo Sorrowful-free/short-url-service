@@ -6,6 +6,7 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
 
+//go:generate mockgen --source=short_url_repository.go --destination=./../../mocks/mock_short_url_repository.go --package=mocks
 type ShortURLRepository interface {
 	Save(ctx context.Context, userID string, shortURL model.ShortURLDto) error
 	SaveBatch(ctx context.Context, userID string, shortURLs []model.ShortURLDto) error

@@ -6,6 +6,7 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
 
+//go:generate mockgen -source=short_url_service.go -destination=./../../mocks/mock_short_url_service.go --package=mocks
 type ShortURLService interface {
 	TryMakeShort(ctx context.Context, userID string, originalURL string) (model.ShortURLDto, error)
 	TryMakeOriginal(ctx context.Context, shortURL string) (model.ShortURLDto, error)

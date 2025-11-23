@@ -7,7 +7,6 @@ on:
       - main
 
 jobs:
-
   branchtest:
     runs-on: ubuntu-latest
 
@@ -40,6 +39,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install PostgreSQL client
+        run: apt-get update && apt-get install -y postgresql-client
+
+      - name: Apply up migrations
+        run: |
+          make migrate-up DB_URI="postgresql://postgres:postgres@postgres/praktikum?sslmode=disable"
+
       - name: Download autotests binaries
         uses: robinraju/release-downloader@v1.8
         with:
@@ -55,6 +61,14 @@ jobs:
           mv $GITHUB_WORKSPACE/.tools/shortenertest_v2 /usr/local/bin/shortenertest
           mv $GITHUB_WORKSPACE/.tools/random /usr/local/bin/random
           mv $GITHUB_WORKSPACE/.tools/wipedb /usr/local/bin/wipedb
+
+      - name: Install mockgen
+        run: |
+          go install github.com/golang/mock/mockgen@latest
+
+      - name: Generate mocks
+        run: |
+          make gen_mocks
 
       - name: Setup go deps
         run: |
