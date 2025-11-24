@@ -16,8 +16,8 @@ func ExampleHandlers_RegisterPingDBHandler() {
 	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем мок сервиса (в реальном приложении используется реальный сервис)
-	var urlService service.ShortURLService
+	// Создаем простую реализацию сервиса для примера
+	urlService := &service.ExampleService{PingError: false}
 
 	// Получаем конфигурацию
 	config := config.GetLocalConfig()
@@ -41,7 +41,7 @@ func ExampleHandlers_RegisterPingDBHandler() {
 
 func ExampleHandlers_RegisterPingDBHandler_error() {
 	e := echo.New()
-	var urlService service.ShortURLService
+	urlService := &service.ExampleService{PingError: true}
 	config := config.GetLocalConfig()
 
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
@@ -59,4 +59,3 @@ func ExampleHandlers_RegisterPingDBHandler_error() {
 	// Status: 500
 	// Body: database connection error
 }
-

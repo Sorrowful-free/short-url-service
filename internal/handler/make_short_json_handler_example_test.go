@@ -18,8 +18,8 @@ func ExampleHandlers_RegisterMakeShortJSONHandler() {
 	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем мок сервиса (в реальном приложении используется реальный сервис)
-	var urlService service.ShortURLService
+	// Создаем простую реализацию сервиса для примера
+	urlService := &service.ExampleService{HasURLs: true}
 
 	// Получаем конфигурацию
 	config := config.GetLocalConfig()
@@ -52,7 +52,7 @@ func ExampleHandlers_RegisterMakeShortJSONHandler() {
 
 func ExampleHandlers_RegisterMakeShortJSONHandler_conflict() {
 	e := echo.New()
-	var urlService service.ShortURLService
+	urlService := &service.ExampleService{ConflictURL: "https://example.com/existing/url"}
 	config := config.GetLocalConfig()
 
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
@@ -79,4 +79,3 @@ func ExampleHandlers_RegisterMakeShortJSONHandler_conflict() {
 	// Status: 409
 	// Short URL: http://localhost:8080/abc123
 }
-

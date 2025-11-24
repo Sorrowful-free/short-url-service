@@ -9,7 +9,7 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/config"
 	"github.com/Sorrowful-free/short-url-service/internal/handler"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
-	"github.com/Sorrowful-free/short-url-service/internal/service"
+	services "github.com/Sorrowful-free/short-url-service/internal/service"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,8 +17,8 @@ func ExampleHandlers_RegisterGetUserUrlsHandler() {
 	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем мок сервиса (в реальном приложении используется реальный сервис)
-	var urlService service.ShortURLService
+	// Создаем простую реализацию сервиса для примера
+	urlService := &services.ExampleService{HasURLs: true}
 
 	// Получаем конфигурацию
 	config := config.GetLocalConfig()
@@ -51,7 +51,7 @@ func ExampleHandlers_RegisterGetUserUrlsHandler() {
 
 func ExampleHandlers_RegisterGetUserUrlsHandler_noContent() {
 	e := echo.New()
-	var urlService service.ShortURLService
+	urlService := &services.ExampleService{HasURLs: false}
 	config := config.GetLocalConfig()
 
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
@@ -69,4 +69,3 @@ func ExampleHandlers_RegisterGetUserUrlsHandler_noContent() {
 	// Status: 204
 	// Body: no content
 }
-

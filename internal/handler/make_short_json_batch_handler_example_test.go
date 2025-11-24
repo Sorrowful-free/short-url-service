@@ -18,8 +18,8 @@ func ExampleHandlers_RegisterMakeShortBatchJSONHandler() {
 	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем мок сервиса (в реальном приложении используется реальный сервис)
-	var urlService service.ShortURLService
+	// Создаем простую реализацию сервиса для примера
+	urlService := &service.ExampleService{HasURLs: true}
 
 	// Получаем конфигурацию
 	config := config.GetLocalConfig()
@@ -66,4 +66,3 @@ func ExampleHandlers_RegisterMakeShortBatchJSONHandler() {
 	// CorrelationID: 2, ShortURL: http://localhost:8080/def456
 	// CorrelationID: 3, ShortURL: http://localhost:8080/ghi789
 }
-

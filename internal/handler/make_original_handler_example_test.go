@@ -17,9 +17,8 @@ func ExampleHandlers_RegisterMakeOriginalHandler() {
 	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем мок сервиса (в реальном приложении используется реальный сервис)
-	// Для примера используем nil, в реальности нужен реализованный сервис
-	var urlService service.ShortURLService
+	// Создаем простую реализацию сервиса для примера
+	urlService := &service.ExampleService{}
 
 	// Получаем конфигурацию
 	config := config.GetLocalConfig()
@@ -43,7 +42,7 @@ func ExampleHandlers_RegisterMakeOriginalHandler() {
 
 func ExampleHandlers_RegisterMakeOriginalHandler_deleted() {
 	e := echo.New()
-	var urlService service.ShortURLService
+	urlService := &service.ExampleService{}
 	config := config.GetLocalConfig()
 
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
@@ -61,4 +60,3 @@ func ExampleHandlers_RegisterMakeOriginalHandler_deleted() {
 	// Status: 410
 	// Body: short url is deleted
 }
-
