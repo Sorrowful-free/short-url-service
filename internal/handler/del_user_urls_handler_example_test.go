@@ -16,20 +16,15 @@ import (
 )
 
 func ExampleHandlers_RegisterDeleteUserURLsHandler() {
-	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем простую реализацию сервиса для примера
 	urlService := &service.ExampleService{HasURLs: true}
 
-	// Получаем конфигурацию
 	config := config.GetLocalConfig()
 
-	// Создаем хэндлеры
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: DELETE запрос для удаления нескольких коротких URL пользователя
 	deleteRequest := model.DeleteShortURLRequest{
 		"abc123",
 		"def456",
@@ -39,7 +34,6 @@ func ExampleHandlers_RegisterDeleteUserURLsHandler() {
 
 	req := httptest.NewRequest(http.MethodDelete, "/api/user/urls", bytes.NewBuffer(jsonBody))
 	req.Header.Set("Content-Type", "application/json")
-	// В реальном приложении здесь должен быть установлен cookie с userID
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
 

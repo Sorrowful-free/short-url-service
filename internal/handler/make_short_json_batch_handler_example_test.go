@@ -15,20 +15,15 @@ import (
 )
 
 func ExampleHandlers_RegisterMakeShortBatchJSONHandler() {
-	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем простую реализацию сервиса для примера
 	urlService := &service.ExampleService{HasURLs: true}
 
-	// Получаем конфигурацию
 	config := config.GetLocalConfig()
 
-	// Создаем хэндлеры
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: POST запрос для создания нескольких коротких URL через batch API
 	batchRequest := model.BatchShortURLRequest{
 		{
 			CorrelationID: "1",

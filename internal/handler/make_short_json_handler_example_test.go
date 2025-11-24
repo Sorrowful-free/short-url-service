@@ -15,20 +15,15 @@ import (
 )
 
 func ExampleHandlers_RegisterMakeShortJSONHandler() {
-	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем простую реализацию сервиса для примера
 	urlService := &service.ExampleService{HasURLs: true}
 
-	// Получаем конфигурацию
 	config := config.GetLocalConfig()
 
-	// Создаем хэндлеры
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: POST запрос для создания короткого URL через JSON API
 	requestBody := model.ShortURLRequest{
 		OriginalURL: "https://example.com/very/long/url/path",
 	}
@@ -58,7 +53,6 @@ func ExampleHandlers_RegisterMakeShortJSONHandler_conflict() {
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: попытка создать короткий URL для уже существующего оригинального URL
 	requestBody := model.ShortURLRequest{
 		OriginalURL: "https://example.com/existing/url",
 	}

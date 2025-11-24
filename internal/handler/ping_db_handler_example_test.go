@@ -13,20 +13,15 @@ import (
 )
 
 func ExampleHandlers_RegisterPingDBHandler() {
-	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем простую реализацию сервиса для примера
 	urlService := &service.ExampleService{PingError: false}
 
-	// Получаем конфигурацию
 	config := config.GetLocalConfig()
 
-	// Создаем хэндлеры
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: GET запрос для проверки доступности базы данных
 	req := httptest.NewRequest(http.MethodGet, "/ping", nil)
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
@@ -47,7 +42,6 @@ func ExampleHandlers_RegisterPingDBHandler_error() {
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: запрос при недоступности базы данных
 	req := httptest.NewRequest(http.MethodGet, "/ping", nil)
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)

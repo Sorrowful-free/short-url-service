@@ -13,20 +13,15 @@ import (
 )
 
 func ExampleHandlers_RegisterMakeShortHandler() {
-	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем простую реализацию сервиса для примера
 	urlService := &service.ExampleService{}
 
-	// Получаем конфигурацию
 	config := config.GetLocalConfig()
 
-	// Создаем хэндлеры
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: POST запрос для создания короткого URL из оригинального URL
 	originalURL := "https://example.com/very/long/url/path"
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(originalURL))
 	rec := httptest.NewRecorder()
@@ -48,7 +43,6 @@ func ExampleHandlers_RegisterMakeShortHandler_conflict() {
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: попытка создать короткий URL для уже существующего оригинального URL
 	originalURL := "https://example.com/existing/url"
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(originalURL))
 	rec := httptest.NewRecorder()

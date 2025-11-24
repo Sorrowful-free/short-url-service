@@ -7,7 +7,6 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
 
-// ExampleService - простая реализация сервиса для примеров
 type ExampleService struct {
 	ConflictURL string
 	HasURLs     bool

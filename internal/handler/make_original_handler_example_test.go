@@ -14,20 +14,15 @@ import (
 )
 
 func ExampleHandlers_RegisterMakeOriginalHandler() {
-	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем простую реализацию сервиса для примера
 	urlService := &service.ExampleService{}
 
-	// Получаем конфигурацию
 	config := config.GetLocalConfig()
 
-	// Создаем хэндлеры
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: GET запрос для получения оригинального URL по короткому идентификатору
 	req := httptest.NewRequest(http.MethodGet, "/abc123", nil)
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
@@ -48,7 +43,6 @@ func ExampleHandlers_RegisterMakeOriginalHandler_deleted() {
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: запрос к удаленному URL
 	req := httptest.NewRequest(http.MethodGet, "/deleted123", nil)
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)

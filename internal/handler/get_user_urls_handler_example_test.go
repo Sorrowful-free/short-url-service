@@ -14,22 +14,16 @@ import (
 )
 
 func ExampleHandlers_RegisterGetUserUrlsHandler() {
-	// Создаем экземпляр Echo
 	e := echo.New()
 
-	// Создаем простую реализацию сервиса для примера
 	urlService := &services.ExampleService{HasURLs: true}
 
-	// Получаем конфигурацию
 	config := config.GetLocalConfig()
 
-	// Создаем хэндлеры
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: GET запрос для получения всех URL пользователя
 	req := httptest.NewRequest(http.MethodGet, "/api/user/urls", nil)
-	// В реальном приложении здесь должен быть установлен cookie с userID
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
 
@@ -57,7 +51,6 @@ func ExampleHandlers_RegisterGetUserUrlsHandler_noContent() {
 	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
 	handlers.RegisterHandlers()
 
-	// Пример: запрос для пользователя без сохраненных URL
 	req := httptest.NewRequest(http.MethodGet, "/api/user/urls", nil)
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
