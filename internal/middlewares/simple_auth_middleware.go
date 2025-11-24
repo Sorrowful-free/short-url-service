@@ -12,11 +12,20 @@ const (
 	FallbackUserID = "0000000000000000"
 )
 
+// SimpleAuthContext extends echo.Context with user identification.
+// It provides access to the authenticated user ID in request handlers.
 type SimpleAuthContext struct {
 	echo.Context
-	UserID string
+	UserID string // The authenticated user ID
 }
 
+// SimpleAuthMiddleware creates an Echo middleware function that handles user authentication.
+// It extracts or generates a user ID from cookies, encrypts it, and sets it in the response.
+// If no user ID is found in cookies, a new one is generated.
+// Parameters:
+//   - userIDEncryptor: the encryptor used to encrypt/decrypt user IDs in cookies
+//
+// Returns an Echo middleware function.
 func SimpleAuthMiddleware(userIDEncryptor crypto.UserIDEncryptor) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -42,6 +51,8 @@ func SimpleAuthMiddleware(userIDEncryptor crypto.UserIDEncryptor) echo.Middlewar
 	}
 }
 
+// GenerateUserID generates a new random user ID.
+// Returns a random string of TestUserIDLength characters, or FallbackUserID if generation fails.
 func GenerateUserID() string {
 	userID, err := crypto.GenerateRandomSequenceString(consts.TestUserIDLength)
 	if err != nil {
@@ -50,6 +61,13 @@ func GenerateUserID() string {
 	return userID
 }
 
+// GetUserID extracts and decrypts the user ID from the request cookies.
+// If no user ID cookie is found, it returns FallbackUserID.
+// Parameters:
+//   - c: the Echo context
+//   - userIDEncryptor: the encryptor used to decrypt the user ID
+//
+// Returns the decrypted user ID and an error if decryption fails.
 func GetUserID(c echo.Context, userIDEncryptor crypto.UserIDEncryptor) (string, error) {
 	cookies := c.Request().Cookies()
 	if len(cookies) == 0 {
@@ -75,6 +93,12 @@ func GetUserID(c echo.Context, userIDEncryptor crypto.UserIDEncryptor) (string, 
 	return userID, nil
 }
 
+// SetUserID encrypts the user ID and sets it as a cookie in the response.
+// If the user ID is empty or the cookie already exists with the same value, no action is taken.
+// Parameters:
+//   - c: the Echo context
+//   - userID: the user ID to encrypt and set
+//   - userIDEncryptor: the encryptor used to encrypt the user ID
 func SetUserID(c echo.Context, userID string, userIDEncryptor crypto.UserIDEncryptor) {
 	if userID == "" {
 		return
@@ -101,6 +125,8 @@ func SetUserID(c echo.Context, userID string, userIDEncryptor crypto.UserIDEncry
 	})
 }
 
+// HasUserID checks if the request contains a user ID cookie.
+// Returns true if a user ID cookie is present, false otherwise.
 func HasUserID(c echo.Context) bool {
 	cookies := c.Request().Cookies()
 	if len(cookies) == 0 {
@@ -115,6 +141,10 @@ func HasUserID(c echo.Context) bool {
 	return false
 }
 
+// TryGetUserID attempts to extract the user ID from the Echo context.
+// If the context is a SimpleAuthContext, it returns the UserID field.
+// Otherwise, it returns FallbackUserID.
+// Returns the user ID from the context, or FallbackUserID if not available.
 func TryGetUserID(c echo.Context) string {
 	if authContext, ok := c.(*SimpleAuthContext); ok {
 		return authContext.UserID

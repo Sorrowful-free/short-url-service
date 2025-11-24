@@ -8,10 +8,17 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
 
+// SimpleShortURLRepository is an in-memory implementation of ShortURLRepository.
+// It stores short URLs in a map structure and is primarily used for testing.
 type SimpleShortURLRepository struct {
 	userShortURLs map[string][]model.ShortURLSafeDto
 }
 
+// NewSimpleShortURLRepository creates a new in-memory repository instance.
+// Parameters:
+//   - fileStoragePath: currently unused, reserved for future file-based persistence
+//
+// Returns a ShortURLRepository implementation and an error if initialization fails.
 func NewSimpleShortURLRepository(fileStoragePath string) (ShortURLRepository, error) {
 	return &SimpleShortURLRepository{
 		userShortURLs: make(map[string][]model.ShortURLSafeDto),

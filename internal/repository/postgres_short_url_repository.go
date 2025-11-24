@@ -13,10 +13,17 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
 
+// PostgresShortURLRepository is a PostgreSQL implementation of ShortURLRepository.
+// It stores short URLs in a PostgreSQL database.
 type PostgresShortURLRepository struct {
 	db *sql.DB
 }
 
+// NewPostgresShortURLRepository creates a new PostgreSQL repository instance.
+// Parameters:
+//   - databaseDSN: the database connection string (Data Source Name)
+//
+// Returns a ShortURLRepository implementation and an error if the connection fails.
 func NewPostgresShortURLRepository(databaseDSN string) (ShortURLRepository, error) {
 
 	db, err := sql.Open("pgx", databaseDSN)
