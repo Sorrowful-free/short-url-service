@@ -83,15 +83,3 @@ func TestMakeOriginalHandler(t *testing.T) {
 		assert.Equal(t, http.StatusGone, resp.StatusCode, "expected status code %d, received %d", http.StatusGone, resp.StatusCode)
 	})
 }
-
-func BenchmarkMakeOriginalHandler(b *testing.B) {
-	e := echo.New()
-	ctrl := gomock.NewController(b)
-	urlService := mocks.NewMockShortURLService(ctrl)
-	config := config.GetLocalConfig()
-	handlers, err := NewHandlers(e, consts.TestBaseURL, urlService, config)
-	if err != nil {
-		b.Fatalf("failed to create handlers: %v", err)
-	}
-	handlers.RegisterHandlers()
-}
