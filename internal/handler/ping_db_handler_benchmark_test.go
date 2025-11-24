@@ -34,4 +34,3 @@ func BenchmarkPingDBHandler(b *testing.B) {
 		e.ServeHTTP(rr, req)
 	}
 }
-

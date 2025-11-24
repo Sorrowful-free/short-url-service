@@ -39,4 +39,3 @@ func BenchmarkDeleteUserURLsHandler(b *testing.B) {
 		e.ServeHTTP(rr, req)
 	}
 }
-

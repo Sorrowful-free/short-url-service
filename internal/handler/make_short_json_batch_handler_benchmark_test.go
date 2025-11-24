@@ -52,4 +52,3 @@ func BenchmarkMakeShortBatchJSONHandler(b *testing.B) {
 		e.ServeHTTP(rr, req)
 	}
 }
-

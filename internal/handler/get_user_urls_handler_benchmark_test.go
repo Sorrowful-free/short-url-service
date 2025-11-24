@@ -53,4 +53,3 @@ func BenchmarkGetUserUrlsHandler(b *testing.B) {
 		e.ServeHTTP(rr, req)
 	}
 }
-
