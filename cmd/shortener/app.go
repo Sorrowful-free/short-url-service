@@ -16,7 +16,6 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/Sorrowful-free/short-url-service/internal/repository"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
-	"github.com/golang-migrate/migrate"
 	"github.com/labstack/echo/v4"
 )
 
@@ -60,30 +59,13 @@ func (a *App) InitUserIDEncryptor() error {
 	return nil
 }
 
-func (a *App) InitMigration() error {
-
-	//if database DSN is not set, we don't need to run migrations
-	if !a.internalConfig.HasDatabaseDSN() {
-		return nil
-	}
-	m, err := migrate.New(a.internalConfig.MigrationsPath, a.internalConfig.DatabaseDSN)
-	if err != nil {
-		return err
-	}
-	err = m.Up()
-	if err != nil && err != migrate.ErrNoChange {
-		return err
-	}
-	return nil
-}
-
 func (a *App) InitURLRepository() error {
 
 	var urlRepository repository.ShortURLRepository
 	var err error
 
 	if a.internalConfig.HasDatabaseDSN() {
-		urlRepository, err = repository.NewPostgresShortURLRepository(a.internalConfig.DatabaseDSN)
+		urlRepository, err = repository.NewPostgresShortURLRepository(a.internalConfig.DatabaseDSN, a.internalConfig.MigrationsPath, a.internalConfig.SkipMigrations)
 	} else if a.internalConfig.HasFileStoragePath() {
 		urlRepository, err = repository.NewFileStorageShortURLRepository(a.internalConfig.FileStoragePath)
 	} else {
@@ -112,7 +94,7 @@ func (a *App) InitHandlers() error {
 	e.Use(middlewares.LoggerAsMiddleware(a.internalLogger))
 	e.Use(middlewares.SimpleAuthMiddleware(a.internalUserIDEncryptor))
 	e.Use(middlewares.GzipMiddleware(a.internalLogger))
-	handlers, err := handler.NewHandlers(e, a.internalConfig.BaseURL, a.internalURLService, a.internalConfig)
+	handlers, err := handler.NewHandlers(e, a.internalConfig.BaseURL, a.internalURLService, a.internalConfig, a.internalLogger)
 	if err != nil {
 		return err
 	}
@@ -130,12 +112,6 @@ func (a *App) Init() error {
 	}
 	if err := a.InitUserIDEncryptor(); err != nil {
 		return err
-	}
-
-	if !a.internalConfig.SkipMigrations {
-		if err := a.InitMigration(); err != nil {
-			return err
-		}
 	}
 	if err := a.InitURLRepository(); err != nil {
 		return err

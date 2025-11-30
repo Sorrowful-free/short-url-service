@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/golang-migrate/migrate"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -16,7 +17,9 @@ import (
 // PostgresShortURLRepository is a PostgreSQL implementation of ShortURLRepository.
 // It stores short URLs in a PostgreSQL database.
 type PostgresShortURLRepository struct {
-	db *sql.DB
+	db             *sql.DB
+	migrationsPath string
+	databaseDSN    string
 }
 
 // NewPostgresShortURLRepository creates a new PostgreSQL repository instance.
@@ -24,16 +27,29 @@ type PostgresShortURLRepository struct {
 //   - databaseDSN: the database connection string (Data Source Name)
 //
 // Returns a ShortURLRepository implementation and an error if the connection fails.
-func NewPostgresShortURLRepository(databaseDSN string) (ShortURLRepository, error) {
+func NewPostgresShortURLRepository(databaseDSN string, migrationsPath string, skipMigrations bool) (ShortURLRepository, error) {
 
 	db, err := sql.Open("pgx", databaseDSN)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PostgresShortURLRepository{
-		db: db,
-	}, nil
+	repository := &PostgresShortURLRepository{
+		db:             db,
+		migrationsPath: migrationsPath,
+		databaseDSN:    databaseDSN,
+	}
+
+	if skipMigrations {
+		return repository, nil
+	}
+
+	err = repository.Migrate()
+	if err != nil {
+		return nil, err
+	}
+
+	return repository, nil
 }
 
 func (r *PostgresShortURLRepository) Save(ctx context.Context, userID string, shortURL model.ShortURLDto) error {
@@ -178,6 +194,23 @@ func (r *PostgresShortURLRepository) Ping(ctx context.Context) error {
 	}
 	err := r.db.PingContext(ctx)
 	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *PostgresShortURLRepository) Migrate() error {
+
+	//if database DSN is not set, we don't need to run migrations
+	if r.databaseDSN == "" {
+		return nil
+	}
+	m, err := migrate.New(r.migrationsPath, r.databaseDSN)
+	if err != nil {
+		return err
+	}
+	err = m.Up()
+	if err != nil && err != migrate.ErrNoChange {
 		return err
 	}
 	return nil
