@@ -78,8 +78,8 @@ func GetLocalConfig() *LocalConfig {
 		localConfig.MigrationsPath = migrationsPath
 	}
 
-	skipMigrations := os.Getenv("SKIP_MIGRATIONS")
-	if skipMigrations != "" {
+	skipMigrations, ok := os.LookupEnv("SKIP_MIGRATIONS")
+	if ok {
 		localConfig.SkipMigrations = skipMigrations == "true"
 	}
 
