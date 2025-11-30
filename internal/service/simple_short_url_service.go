@@ -11,6 +11,8 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/repository"
 )
 
+// SimpleShortURLService is a concrete implementation of ShortURLService.
+// It provides URL shortening functionality with configurable UID length and retry logic.
 type SimpleShortURLService struct {
 	uidLength          int
 	retryCount         int
@@ -18,6 +20,14 @@ type SimpleShortURLService struct {
 	ShortURLRepository repository.ShortURLRepository
 }
 
+// NewSimpleService creates a new instance of SimpleShortURLService.
+// Parameters:
+//   - uidLength: the length of generated short URL identifiers
+//   - retryCount: maximum number of retries when generating unique identifiers
+//   - shortURLRepository: the repository implementation for storing and retrieving URLs
+//   - logger: the logger instance for logging operations
+//
+// Returns a ShortURLService implementation and an error if initialization fails.
 func NewSimpleService(uidLength int, retryCount int, shortURLRepository repository.ShortURLRepository, logger logger.Logger) (ShortURLService, error) {
 	service := SimpleShortURLService{
 		uidLength:          uidLength,
@@ -28,6 +38,9 @@ func NewSimpleService(uidLength int, retryCount int, shortURLRepository reposito
 	return &service, nil
 }
 
+// TryMakeShort creates a new short URL for the given original URL.
+// It generates a unique identifier and saves it to the repository.
+// If the original URL already exists, it returns the existing short URL.
 func (service SimpleShortURLService) TryMakeShort(ctx context.Context, userID string, originalURL string) (model.ShortURLDto, error) {
 
 	shortUID, err := service.makeSimpleUUIDString(ctx)
@@ -56,6 +69,7 @@ func (service SimpleShortURLService) TryMakeShort(ctx context.Context, userID st
 	return dto, nil
 }
 
+// TryMakeOriginal retrieves the original URL for the given short URL identifier.
 func (service SimpleShortURLService) TryMakeOriginal(ctx context.Context, shortUID string) (model.ShortURLDto, error) {
 	dto, err := service.ShortURLRepository.GetByUID(ctx, shortUID)
 
@@ -68,6 +82,7 @@ func (service SimpleShortURLService) TryMakeOriginal(ctx context.Context, shortU
 	return dto, nil
 }
 
+// TryMakeShortBatch creates multiple short URLs for the given list of original URLs.
 func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, userID string, originalURLs []string) ([]model.ShortURLDto, error) {
 	shortURLs := make([]model.ShortURLDto, len(originalURLs))
 	for i, originalURL := range originalURLs {
@@ -86,14 +101,17 @@ func (service SimpleShortURLService) TryMakeShortBatch(ctx context.Context, user
 	return shortURLs, nil
 }
 
+// GetUserUrls retrieves all short URLs associated with the given user ID.
 func (service SimpleShortURLService) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
 	return service.ShortURLRepository.GetUserUrls(ctx, userID)
 }
 
+// DeleteShortURLs marks the specified short URLs as deleted for the given user.
 func (service SimpleShortURLService) DeleteShortURLs(ctx context.Context, userID string, shortURLs []string) error {
 	return service.ShortURLRepository.DeleteShortURLs(ctx, userID, shortURLs)
 }
 
+// Ping checks the connectivity to the underlying data store.
 func (service SimpleShortURLService) Ping(ctx context.Context) error {
 	return service.ShortURLRepository.Ping(ctx)
 }

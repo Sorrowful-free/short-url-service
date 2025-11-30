@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Sorrowful-free/short-url-service/internal/consts"
+	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/labstack/echo/v4"
 )
 
@@ -23,5 +24,5 @@ func (h *Handlers) RegisterMakeOriginalHandler() {
 		c.Response().Header().Set(consts.HeaderLocation, dto.OriginalURL)
 
 		return c.Redirect(http.StatusTemporaryRedirect, dto.OriginalURL)
-	})
+	}, middlewares.AuditMiddleWare(h.internalConfig, middlewares.AuditFollow))
 }

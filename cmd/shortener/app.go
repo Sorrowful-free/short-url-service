@@ -1,6 +1,9 @@
 package main
 
 import (
+	"net/http"
+	_ "net/http/pprof"
+
 	_ "github.com/golang-migrate/migrate/database/postgres"
 	_ "github.com/golang-migrate/migrate/source/file"
 
@@ -13,7 +16,6 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/middlewares"
 	"github.com/Sorrowful-free/short-url-service/internal/repository"
 	"github.com/Sorrowful-free/short-url-service/internal/service"
-	"github.com/golang-migrate/migrate"
 	"github.com/labstack/echo/v4"
 )
 
@@ -57,30 +59,13 @@ func (a *App) InitUserIDEncryptor() error {
 	return nil
 }
 
-func (a *App) InitMigration() error {
-
-	//if database DSN is not set, we don't need to run migrations
-	if !a.internalConfig.HasDatabaseDSN() {
-		return nil
-	}
-	m, err := migrate.New(a.internalConfig.MigrationsPath, a.internalConfig.DatabaseDSN)
-	if err != nil {
-		return err
-	}
-	err = m.Up()
-	if err != nil && err != migrate.ErrNoChange {
-		return err
-	}
-	return nil
-}
-
 func (a *App) InitURLRepository() error {
 
 	var urlRepository repository.ShortURLRepository
 	var err error
 
 	if a.internalConfig.HasDatabaseDSN() {
-		urlRepository, err = repository.NewPostgresShortURLRepository(a.internalConfig.DatabaseDSN)
+		urlRepository, err = repository.NewPostgresShortURLRepository(a.internalConfig.DatabaseDSN, a.internalConfig.MigrationsPath, a.internalConfig.SkipMigrations)
 	} else if a.internalConfig.HasFileStoragePath() {
 		urlRepository, err = repository.NewFileStorageShortURLRepository(a.internalConfig.FileStoragePath)
 	} else {
@@ -109,7 +94,7 @@ func (a *App) InitHandlers() error {
 	e.Use(middlewares.LoggerAsMiddleware(a.internalLogger))
 	e.Use(middlewares.SimpleAuthMiddleware(a.internalUserIDEncryptor))
 	e.Use(middlewares.GzipMiddleware(a.internalLogger))
-	handlers, err := handler.NewHandlers(e, a.internalConfig.BaseURL, a.internalURLService)
+	handlers, err := handler.NewHandlers(e, a.internalConfig.BaseURL, a.internalURLService, a.internalConfig)
 	if err != nil {
 		return err
 	}
@@ -128,9 +113,6 @@ func (a *App) Init() error {
 	if err := a.InitUserIDEncryptor(); err != nil {
 		return err
 	}
-	if err := a.InitMigration(); err != nil {
-		return err
-	}
 	if err := a.InitURLRepository(); err != nil {
 		return err
 	}
@@ -144,5 +126,13 @@ func (a *App) Init() error {
 }
 
 func (a *App) Run() error {
+	go func() {
+		pprofAddr := "localhost:6060"
+		a.internalLogger.Info("Starting pprof server on " + pprofAddr)
+		if err := http.ListenAndServe(pprofAddr, nil); err != nil {
+			a.internalLogger.Error("pprof server error: " + err.Error())
+		}
+	}()
+
 	return a.internalEcho.Start(a.internalConfig.ListenAddr)
 }
