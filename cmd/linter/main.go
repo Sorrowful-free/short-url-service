@@ -17,14 +17,14 @@ const (
 	exitFuncName  = "Exit"
 )
 
-var analyzer = &analysis.Analyzer{
+var Analyzer = &analysis.Analyzer{
 	Name: "panic_check",
 	Doc:  "checks the use of panic, log.Fatal and os.Exit",
 	Run:  run,
 }
 
 func main() {
-	singlechecker.Main(analyzer)
+	singlechecker.Main(Analyzer)
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
