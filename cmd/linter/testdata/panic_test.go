@@ -11,4 +11,3 @@ func anotherFunction() {
 func main() {
 	panic("main panic") // want "using panic is not allowed"
 }
-

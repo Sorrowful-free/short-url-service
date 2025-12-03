@@ -13,4 +13,3 @@ func anotherFunction() {
 func main() {
 	log.Fatal("this is allowed")
 }
-
