@@ -19,6 +19,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var (
+	buildVersion string
+	buildDate    string
+	buildCommit  string
+)
+
 type App struct {
 	internalContext         context.Context
 	internalConfig          *config.LocalConfig
@@ -125,6 +131,13 @@ func (a *App) Init() error {
 	return nil
 }
 
+func (a *App) PrintInfo(prefix string, str string) {
+	if str == "" {
+		str = "N/A"
+	}
+	a.internalLogger.Info(prefix + ": " + str)
+}
+
 func (a *App) Run() error {
 	go func() {
 		pprofAddr := "localhost:6060"
@@ -133,6 +146,10 @@ func (a *App) Run() error {
 			a.internalLogger.Error("pprof server error: " + err.Error())
 		}
 	}()
+
+	a.PrintInfo("Build version", buildVersion)
+	a.PrintInfo("Build date", buildDate)
+	a.PrintInfo("Build commit", buildCommit)
 
 	return a.internalEcho.Start(a.internalConfig.ListenAddr)
 }
