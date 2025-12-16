@@ -21,6 +21,8 @@ type LocalConfig struct {
 
 	AuditFilePath string
 	AuditURL      string
+
+	IsSecure bool
 }
 
 var localConfig *LocalConfig
@@ -40,12 +42,13 @@ func GetLocalConfig() *LocalConfig {
 	flag.IntVar(&localConfig.UIDRetryCount, "r", 10, "retry count for the short URL")
 	flag.StringVar(&localConfig.FileStoragePath, "f", "", "file storage path")
 	flag.StringVar(&localConfig.MigrationsPath, "m", "file://./migrations", "migrations path")
-	flag.BoolVar(&localConfig.SkipMigrations, "s", false, "skip migrations")
+	flag.BoolVar(&localConfig.SkipMigrations, "sm", false, "skip migrations")
 	flag.StringVar(&localConfig.DatabaseDSN, "d", "", "postgres DSN")
 	flag.IntVar(&localConfig.UserIDLength, "u", 8, "length of the user ID")
 	flag.StringVar(&localConfig.UserIDCriptoKey, "k", "", "user ID cripto key")
 	flag.StringVar(&localConfig.AuditFilePath, "audit-file", "", "audit file path")
 	flag.StringVar(&localConfig.AuditURL, "audit-url", "", "audit URL")
+	flag.BoolVar(&localConfig.IsSecure, "s", false, "is that server will use https protocol")
 	flag.Parse()
 
 	//override default values with values from environment variables if they are set
@@ -110,6 +113,11 @@ func GetLocalConfig() *LocalConfig {
 	auditURL := os.Getenv("AUDIT_URL")
 	if auditURL != "" {
 		localConfig.AuditURL = auditURL
+	}
+
+	isSecure, ok := os.LookupEnv("ENABLE_HTTPS")
+	if ok {
+		localConfig.IsSecure = isSecure == "true"
 	}
 
 	return localConfig

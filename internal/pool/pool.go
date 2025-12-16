@@ -2,14 +2,14 @@ package pool
 
 import "sync"
 
-type Pool[T Resetable] struct {
+type Pool[T Resetter] struct {
 	items    []T
 	mu       sync.RWMutex
 	factory  func() T
 	capacity int
 }
 
-func NewPool[T Resetable](factory func() T, capacity int) *Pool[T] {
+func NewPool[T Resetter](factory func() T, capacity int) *Pool[T] {
 	return &Pool[T]{
 		items:    make([]T, capacity),
 		factory:  factory,

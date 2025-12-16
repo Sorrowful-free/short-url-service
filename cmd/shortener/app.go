@@ -151,5 +151,9 @@ func (a *App) Run() error {
 	a.PrintInfo("Build date", buildDate)
 	a.PrintInfo("Build commit", buildCommit)
 
-	return a.internalEcho.Start(a.internalConfig.ListenAddr)
+	if a.internalConfig.IsSecure {
+		return a.internalEcho.StartTLS(a.internalConfig.ListenAddr, "cert.pem", "key.pem")
+	} else {
+		return a.internalEcho.Start(a.internalConfig.ListenAddr)
+	}
 }
