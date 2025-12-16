@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"flag"
 	"log"
 	"os"
@@ -8,21 +9,21 @@ import (
 )
 
 type LocalConfig struct {
-	ListenAddr      string
-	BaseURL         string
-	UIDLength       int
-	UIDRetryCount   int
-	FileStoragePath string
-	MigrationsPath  string
-	SkipMigrations  bool
-	DatabaseDSN     string
-	UserIDLength    int
-	UserIDCriptoKey string
+	ListenAddr      string `json:"server_address"`
+	BaseURL         string `json:"base_url"`
+	UIDLength       int    `json:"uid_lenth"`
+	UIDRetryCount   int    `json:"uid_retry_count"`
+	FileStoragePath string `json:"file_storage_path"`
+	MigrationsPath  string `json:"migrations_path"`
+	SkipMigrations  bool   `json:"skip_migrations"`
+	DatabaseDSN     string `json:"database_dsn"`
+	UserIDLength    int    `json:"user_id_length"`
+	UserIDCriptoKey string `json:"user_id_cripto_key"`
 
-	AuditFilePath string
-	AuditURL      string
+	AuditFilePath string `json:"audit_file"`
+	AuditURL      string `json:"audit_url"`
 
-	IsSecure bool
+	IsSecure bool `json:"enable_https"`
 }
 
 var localConfig *LocalConfig
@@ -34,6 +35,8 @@ func GetLocalConfig() *LocalConfig {
 	}
 
 	localConfig = &LocalConfig{}
+
+	localConfig.tryParceFromFile()
 
 	//default values takes from flags
 	flag.StringVar(&localConfig.ListenAddr, "a", "localhost:8080", "listen address")
@@ -121,6 +124,32 @@ func GetLocalConfig() *LocalConfig {
 	}
 
 	return localConfig
+}
+
+func (c *LocalConfig) tryParceFromFile() {
+	configFilePath := ""
+
+	flag.StringVar(&configFilePath, "c", "config.json", "config file json format")
+	if configFilePath == "" {
+		flag.StringVar(&configFilePath, "config", "config.json", "config file json format")
+	}
+
+	configFilePath, ok := os.LookupEnv("CONFIG")
+	if ok {
+		configJsonFile, err := os.Open(configFilePath)
+
+		if os.IsNotExist(err) {
+			log.Printf("config file doesnot exist: %s", err)
+		} else if err != nil {
+			log.Printf("something wrong when parse config : %s", err)
+		}
+		defer configJsonFile.Close()
+
+		err = json.NewDecoder(configJsonFile).Decode(&c)
+		if err != nil {
+			log.Printf("something wrong when parse config : %s", err)
+		}
+	}
 }
 
 func (c *LocalConfig) HasFileStoragePath() bool {
