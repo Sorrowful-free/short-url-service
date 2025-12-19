@@ -157,3 +157,8 @@ func (a *App) Run() error {
 		return a.internalEcho.Start(a.internalConfig.ListenAddr)
 	}
 }
+
+func (a *App) Shutdown(ctx context.Context) error {
+	a.internalLogger.Info("Начинаем штатное завершение сервера...")
+	return a.internalEcho.Shutdown(ctx)
+}
