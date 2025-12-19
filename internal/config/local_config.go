@@ -136,16 +136,16 @@ func (c *LocalConfig) tryParceFromFile() {
 
 	configFilePath, ok := os.LookupEnv("CONFIG")
 	if ok {
-		configJsonFile, err := os.Open(configFilePath)
+		configJSONFile, err := os.Open(configFilePath)
 
 		if os.IsNotExist(err) {
 			log.Printf("config file doesnot exist: %s", err)
 		} else if err != nil {
 			log.Printf("something wrong when parse config : %s", err)
 		}
-		defer configJsonFile.Close()
+		defer configJSONFile.Close()
 
-		err = json.NewDecoder(configJsonFile).Decode(&c)
+		err = json.NewDecoder(configJSONFile).Decode(&c)
 		if err != nil {
 			log.Printf("something wrong when parse config : %s", err)
 		}
