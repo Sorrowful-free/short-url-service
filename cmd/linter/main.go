@@ -2,6 +2,7 @@ package main
 
 import (
 	"go/ast"
+	"go/types"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/singlechecker"
@@ -81,10 +82,26 @@ func checkLogFatal(callExpr *ast.CallExpr, file *ast.File, pass *analysis.Pass, 
 		return false
 	}
 
-	pkgName := pkgIdent.Name
 	funcName := selExpr.Sel.Name
+	if funcName != fatalFuncName {
+		return false
+	}
 
-	if pkgName == logPkgName && funcName == fatalFuncName {
+	if pass.TypesInfo == nil {
+		return false
+	}
+
+	obj, ok := pass.TypesInfo.Uses[pkgIdent]
+	if !ok {
+		return false
+	}
+
+	pkgName, ok := obj.(*types.PkgName)
+	if !ok {
+		return false
+	}
+
+	if pkgName.Pkg().Path() == logPkgName {
 		if !isMainPackage || !isInMainFunction(callExpr, file, pass) {
 			pass.Reportf(callExpr.Pos(), "calling log.Fatal outside the main function of package main is not allowed")
 		}

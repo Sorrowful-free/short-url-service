@@ -3,17 +3,15 @@ package pool
 import "sync"
 
 type Pool[T Resetter] struct {
-	items    []T
-	mu       sync.RWMutex
-	factory  func() T
-	capacity int
+	items   []T
+	mu      sync.RWMutex
+	factory func() T
 }
 
 func NewPool[T Resetter](factory func() T, capacity int) *Pool[T] {
 	return &Pool[T]{
-		items:    make([]T, capacity),
-		factory:  factory,
-		capacity: capacity,
+		items:   make([]T, capacity), // capacity used for prewarm slice
+		factory: factory,
 	}
 }
 
