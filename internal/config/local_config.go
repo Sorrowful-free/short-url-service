@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"flag"
 	"log"
 	"os"
@@ -8,19 +9,21 @@ import (
 )
 
 type LocalConfig struct {
-	ListenAddr      string
-	BaseURL         string
-	UIDLength       int
-	UIDRetryCount   int
-	FileStoragePath string
-	MigrationsPath  string
-	SkipMigrations  bool
-	DatabaseDSN     string
-	UserIDLength    int
-	UserIDCriptoKey string
+	ListenAddr      string `json:"server_address"`
+	BaseURL         string `json:"base_url"`
+	UIDLength       int    `json:"uid_lenth"`
+	UIDRetryCount   int    `json:"uid_retry_count"`
+	FileStoragePath string `json:"file_storage_path"`
+	MigrationsPath  string `json:"migrations_path"`
+	SkipMigrations  bool   `json:"skip_migrations"`
+	DatabaseDSN     string `json:"database_dsn"`
+	UserIDLength    int    `json:"user_id_length"`
+	UserIDCriptoKey string `json:"user_id_cripto_key"`
 
-	AuditFilePath string
-	AuditURL      string
+	AuditFilePath string `json:"audit_file"`
+	AuditURL      string `json:"audit_url"`
+
+	IsSecure bool `json:"enable_https"`
 }
 
 var localConfig *LocalConfig
@@ -33,6 +36,8 @@ func GetLocalConfig() *LocalConfig {
 
 	localConfig = &LocalConfig{}
 
+	localConfig.tryParceFromFile()
+
 	//default values takes from flags
 	flag.StringVar(&localConfig.ListenAddr, "a", "localhost:8080", "listen address")
 	flag.StringVar(&localConfig.BaseURL, "b", "http://localhost:8080", "base URL")
@@ -40,12 +45,13 @@ func GetLocalConfig() *LocalConfig {
 	flag.IntVar(&localConfig.UIDRetryCount, "r", 10, "retry count for the short URL")
 	flag.StringVar(&localConfig.FileStoragePath, "f", "", "file storage path")
 	flag.StringVar(&localConfig.MigrationsPath, "m", "file://./migrations", "migrations path")
-	flag.BoolVar(&localConfig.SkipMigrations, "s", false, "skip migrations")
+	flag.BoolVar(&localConfig.SkipMigrations, "sm", false, "skip migrations")
 	flag.StringVar(&localConfig.DatabaseDSN, "d", "", "postgres DSN")
 	flag.IntVar(&localConfig.UserIDLength, "u", 8, "length of the user ID")
 	flag.StringVar(&localConfig.UserIDCriptoKey, "k", "", "user ID cripto key")
 	flag.StringVar(&localConfig.AuditFilePath, "audit-file", "", "audit file path")
 	flag.StringVar(&localConfig.AuditURL, "audit-url", "", "audit URL")
+	flag.BoolVar(&localConfig.IsSecure, "s", false, "is that server will use https protocol")
 	flag.Parse()
 
 	//override default values with values from environment variables if they are set
@@ -112,7 +118,38 @@ func GetLocalConfig() *LocalConfig {
 		localConfig.AuditURL = auditURL
 	}
 
+	isSecure, ok := os.LookupEnv("ENABLE_HTTPS")
+	if ok {
+		localConfig.IsSecure = isSecure == "true"
+	}
+
 	return localConfig
+}
+
+func (c *LocalConfig) tryParceFromFile() {
+	configFilePath := ""
+
+	flag.StringVar(&configFilePath, "c", "config.json", "config file json format")
+	if configFilePath == "" {
+		flag.StringVar(&configFilePath, "config", "config.json", "config file json format")
+	}
+
+	configFilePath, ok := os.LookupEnv("CONFIG")
+	if ok {
+		configJSONFile, err := os.Open(configFilePath)
+
+		if os.IsNotExist(err) {
+			log.Printf("config file doesnot exist: %s", err)
+		} else if err != nil {
+			log.Printf("something wrong when parse config : %s", err)
+		}
+		defer configJSONFile.Close()
+
+		err = json.NewDecoder(configJSONFile).Decode(&c)
+		if err != nil {
+			log.Printf("something wrong when parse config : %s", err)
+		}
+	}
 }
 
 func (c *LocalConfig) HasFileStoragePath() bool {
