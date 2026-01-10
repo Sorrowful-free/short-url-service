@@ -5,51 +5,52 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 
 	"github.com/Sorrowful-free/short-url-service/internal/handler"
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
 
-func ExampleHandlers_RegisterGetUserUrlsHandler() {
+func ExampleHandlers_RegisterGetStatHandler() {
 	handlers := handler.NewExampleHandlers()
 
 	echo := handlers.Echo
-	handlers.URLService.SetHasURLs(true)
+	handlers.Handlers.RegisterGetStatHandler()
+	handlers.StatService.SetGetStatsError(false)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/user/urls", nil)
 	rec := httptest.NewRecorder()
 	echo.ServeHTTP(rec, req)
 
-	var response model.UserShortURLResponse
-	json.Unmarshal(rec.Body.Bytes(), &response)
+	var stats model.StatDto
+	body := rec.Body.String()
+	json.Unmarshal([]byte(body), &stats)
 
 	fmt.Printf("Status: %d\n", rec.Code)
-	fmt.Printf("Found %d URLs\n", len(response))
-	for _, item := range response {
-		fmt.Printf("ShortURL: %s, OriginalURL: %s\n", item.ShortURL, item.OriginalURL)
-	}
+	fmt.Printf("URLs: %d\n", stats.Urls)
+	fmt.Printf("Users: %d\n", stats.Users)
 
 	// Output:
 	// Status: 200
-	// Found 2 URLs
-	// ShortURL: http://localhost:8080/abc123, OriginalURL: https://example.com/url1
-	// ShortURL: http://localhost:8080/def456, OriginalURL: https://example.com/url2
+	// URLs: 1
+	// Users: 1
 }
 
-func ExampleHandlers_RegisterGetUserUrlsHandler_noContent() {
+func ExampleHandlers_RegisterGetStatHandler_error() {
 	handlers := handler.NewExampleHandlers()
 
 	echo := handlers.Echo
-	handlers.URLService.SetHasURLs(false)
+	handlers.Handlers.RegisterGetStatHandler()
+	handlers.StatService.SetGetStatsError(true)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/user/urls", nil)
 	rec := httptest.NewRecorder()
 	echo.ServeHTTP(rec, req)
 
 	fmt.Printf("Status: %d\n", rec.Code)
-	fmt.Printf("Body: %s\n", rec.Body.String())
+	fmt.Printf("Body: %s\n", strings.TrimSpace(rec.Body.String()))
 
 	// Output:
-	// Status: 204
-	// Body: no content
+	// Status: 500
+	// Body: database connection error
 }

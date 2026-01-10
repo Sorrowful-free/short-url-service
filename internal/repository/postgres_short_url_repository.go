@@ -199,6 +199,29 @@ func (r *PostgresShortURLRepository) Ping(ctx context.Context) error {
 	return nil
 }
 
+func (r *PostgresShortURLRepository) GetStats(ctx context.Context) (model.StatDto, error) {
+	if ctx.Err() != nil {
+		return model.StatDto{}, ctx.Err()
+	}
+
+	var urlsCount int
+	err := r.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM short_urls").Scan(&urlsCount)
+	if err != nil {
+		return model.StatDto{}, err
+	}
+
+	var usersCount int
+	err = r.db.QueryRowContext(ctx, "SELECT COUNT(DISTINCT user_id) FROM short_urls").Scan(&usersCount)
+	if err != nil {
+		return model.StatDto{}, err
+	}
+
+	return model.StatDto{
+		Urls:  urlsCount,
+		Users: usersCount,
+	}, nil
+}
+
 func (r *PostgresShortURLRepository) Migrate() error {
 
 	//if database DSN is not set, we don't need to run migrations

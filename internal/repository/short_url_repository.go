@@ -43,4 +43,8 @@ type ShortURLRepository interface {
 	// Ping checks the connectivity to the underlying data store.
 	// Returns an error if the connection cannot be established.
 	Ping(ctx context.Context) error
+
+	// GetStats retrieves statistics about the stored short URLs.
+	// Returns the StatDto containing the number of URLs and users, and an error if the operation fails.
+	GetStats(ctx context.Context) (model.StatDto, error)
 }
