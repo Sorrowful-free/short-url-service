@@ -75,3 +75,7 @@ func (r *FileStorageShortURLRepository) GetUserUrls(ctx context.Context, userID 
 	}
 	return r.SimpleShortURLRepository.GetUserUrls(ctx, userID)
 }
+
+func (r *FileStorageShortURLRepository) GetStats(ctx context.Context) (model.StatDto, error) {
+	return r.SimpleShortURLRepository.GetStats(ctx)
+}

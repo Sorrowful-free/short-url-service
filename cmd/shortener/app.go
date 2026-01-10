@@ -34,6 +34,7 @@ type App struct {
 
 	internalURLRepository repository.ShortURLRepository
 	internalURLService    service.ShortURLService
+	internalStatService   service.StatService
 }
 
 func NewApp(ctx context.Context) *App {
@@ -65,7 +66,7 @@ func (a *App) InitUserIDEncryptor() error {
 	return nil
 }
 
-func (a *App) InitURLRepository() error {
+func (a *App) InitRepositories() error {
 
 	var urlRepository repository.ShortURLRepository
 	var err error
@@ -86,12 +87,16 @@ func (a *App) InitURLRepository() error {
 	return nil
 }
 
-func (a *App) InitURLService() error {
+func (a *App) InitServices() error {
 	urlService, err := service.NewSimpleService(a.internalConfig.UIDLength, a.internalConfig.UIDRetryCount, a.internalURLRepository, a.internalLogger)
 	if err != nil {
 		return err
 	}
 	a.internalURLService = urlService
+
+	statService := service.NewStatService(a.internalURLRepository)
+	a.internalStatService = statService
+
 	return nil
 }
 
@@ -100,7 +105,7 @@ func (a *App) InitHandlers() error {
 	e.Use(middlewares.LoggerAsMiddleware(a.internalLogger))
 	e.Use(middlewares.SimpleAuthMiddleware(a.internalUserIDEncryptor))
 	e.Use(middlewares.GzipMiddleware(a.internalLogger))
-	handlers, err := handler.NewHandlers(e, a.internalConfig.BaseURL, a.internalURLService, a.internalConfig)
+	handlers, err := handler.NewHandlers(e, a.internalURLService, a.internalStatService, a.internalConfig)
 	if err != nil {
 		return err
 	}
@@ -119,10 +124,10 @@ func (a *App) Init() error {
 	if err := a.InitUserIDEncryptor(); err != nil {
 		return err
 	}
-	if err := a.InitURLRepository(); err != nil {
+	if err := a.InitRepositories(); err != nil {
 		return err
 	}
-	if err := a.InitURLService(); err != nil {
+	if err := a.InitServices(); err != nil {
 		return err
 	}
 	if err := a.InitHandlers(); err != nil {

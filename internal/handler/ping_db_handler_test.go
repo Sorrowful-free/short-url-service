@@ -6,32 +6,21 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Sorrowful-free/short-url-service/internal/config"
-	"github.com/Sorrowful-free/short-url-service/internal/consts"
-	"github.com/Sorrowful-free/short-url-service/mocks"
 	"github.com/golang/mock/gomock"
-	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPingDBHandler(t *testing.T) {
 	t.Run("positive case ping database", func(t *testing.T) {
-		e := echo.New()
-		ctrl := gomock.NewController(t)
-		urlService := mocks.NewMockShortURLService(ctrl)
-
-		config := config.GetLocalConfig()
-		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService, config)
-		if err != nil {
-			t.Fatalf("failed to create handlers: %v", err)
-		}
-		handlers.RegisterHandlers()
+		testHandlers := NewTestHandlers(t)
+		echo := testHandlers.echo
+		urlService := testHandlers.urlService
 
 		urlService.EXPECT().Ping(gomock.Any()).Return(nil)
 
 		req := httptest.NewRequest(http.MethodGet, PingDBPath, nil)
 		rr := httptest.NewRecorder()
-		e.ServeHTTP(rr, req)
+		echo.ServeHTTP(rr, req)
 
 		resp := rr.Result()
 		defer resp.Body.Close()
@@ -40,22 +29,15 @@ func TestPingDBHandler(t *testing.T) {
 	})
 
 	t.Run("negative case ping database", func(t *testing.T) {
-		e := echo.New()
-		ctrl := gomock.NewController(t)
-		urlService := mocks.NewMockShortURLService(ctrl)
-
-		config := config.GetLocalConfig()
-		handlers, err := NewHandlers(e, consts.TestBaseURL, urlService, config)
-		if err != nil {
-			t.Fatalf("failed to create handlers: %v", err)
-		}
-		handlers.RegisterHandlers()
+		testHandlers := NewTestHandlers(t)
+		echo := testHandlers.echo
+		urlService := testHandlers.urlService
 
 		urlService.EXPECT().Ping(gomock.Any()).Return(errors.New("test error"))
 
 		req := httptest.NewRequest(http.MethodGet, PingDBPath, nil)
 		rr := httptest.NewRecorder()
-		e.ServeHTTP(rr, req)
+		echo.ServeHTTP(rr, req)
 
 		resp := rr.Result()
 		defer resp.Body.Close()

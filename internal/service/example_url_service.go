@@ -7,27 +7,42 @@ import (
 	"github.com/Sorrowful-free/short-url-service/internal/model"
 )
 
-type ExampleService struct {
+type ExampleUrlService struct {
 	ConflictURL string
 	HasURLs     bool
 	PingError   bool
 }
 
-func (s *ExampleService) TryMakeShort(ctx context.Context, userID string, originalURL string) (model.ShortURLDto, error) {
+func (s *ExampleUrlService) SetConflictUrl(conflictUrl string) *ExampleUrlService {
+	s.ConflictURL = conflictUrl
+	return s
+}
+
+func (s *ExampleUrlService) SetHasURLs(hasURLs bool) *ExampleUrlService {
+	s.HasURLs = hasURLs
+	return s
+}
+
+func (s *ExampleUrlService) SetPingError(pingError bool) *ExampleUrlService {
+	s.PingError = pingError
+	return s
+}
+
+func (s *ExampleUrlService) TryMakeShort(ctx context.Context, userID string, originalURL string) (model.ShortURLDto, error) {
 	if originalURL == s.ConflictURL {
 		return model.NewShortURLDto("abc123", originalURL, false), NewOriginalURLConflictServiceError(originalURL)
 	}
 	return model.NewShortURLDto("abc123", originalURL, false), nil
 }
 
-func (s *ExampleService) TryMakeOriginal(ctx context.Context, shortURL string) (model.ShortURLDto, error) {
+func (s *ExampleUrlService) TryMakeOriginal(ctx context.Context, shortURL string) (model.ShortURLDto, error) {
 	if shortURL == "deleted123" {
 		return model.ShortURLDto{ShortUID: shortURL, OriginalURL: "https://example.com/original-url", IsDeleted: true}, nil
 	}
 	return model.ShortURLDto{ShortUID: shortURL, OriginalURL: "https://example.com/original-url", IsDeleted: false}, nil
 }
 
-func (s *ExampleService) TryMakeShortBatch(ctx context.Context, userID string, originalURLs []string) ([]model.ShortURLDto, error) {
+func (s *ExampleUrlService) TryMakeShortBatch(ctx context.Context, userID string, originalURLs []string) ([]model.ShortURLDto, error) {
 	result := make([]model.ShortURLDto, len(originalURLs))
 	shortUIDs := []string{"abc123", "def456", "ghi789"}
 	for i, url := range originalURLs {
@@ -38,7 +53,7 @@ func (s *ExampleService) TryMakeShortBatch(ctx context.Context, userID string, o
 	return result, nil
 }
 
-func (s *ExampleService) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
+func (s *ExampleUrlService) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
 	if !s.HasURLs {
 		return []model.ShortURLDto{}, nil
 	}
@@ -48,11 +63,11 @@ func (s *ExampleService) GetUserUrls(ctx context.Context, userID string) ([]mode
 	}, nil
 }
 
-func (s *ExampleService) DeleteShortURLs(ctx context.Context, userID string, shortURLs []string) error {
+func (s *ExampleUrlService) DeleteShortURLs(ctx context.Context, userID string, shortURLs []string) error {
 	return nil
 }
 
-func (s *ExampleService) Ping(ctx context.Context) error {
+func (s *ExampleUrlService) Ping(ctx context.Context) error {
 	if s.PingError {
 		return errors.New("database connection error")
 	}
