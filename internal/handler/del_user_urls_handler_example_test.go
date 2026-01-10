@@ -16,7 +16,7 @@ func ExampleHandlers_RegisterDeleteUserURLsHandler() {
 	handlers := handler.NewExampleHandlers()
 
 	echo := handlers.Echo
-	handlers.UrlService.SetHasURLs(true)
+	handlers.URLService.SetHasURLs(true)
 
 	deleteRequest := model.DeleteShortURLRequest{
 		"abc123",

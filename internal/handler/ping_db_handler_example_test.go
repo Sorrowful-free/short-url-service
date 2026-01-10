@@ -13,7 +13,7 @@ func ExampleHandlers_RegisterPingDBHandler() {
 	handlers := handler.NewExampleHandlers()
 
 	echo := handlers.Echo
-	handlers.UrlService.SetPingError(false)
+	handlers.URLService.SetPingError(false)
 
 	req := httptest.NewRequest(http.MethodGet, "/ping", nil)
 	rec := httptest.NewRecorder()
@@ -31,7 +31,7 @@ func ExampleHandlers_RegisterPingDBHandler_error() {
 	handlers := handler.NewExampleHandlers()
 
 	echo := handlers.Echo
-	handlers.UrlService.SetPingError(true)
+	handlers.URLService.SetPingError(true)
 
 	req := httptest.NewRequest(http.MethodGet, "/ping", nil)
 	rec := httptest.NewRecorder()

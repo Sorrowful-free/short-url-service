@@ -15,7 +15,7 @@ func ExampleHandlers_RegisterMakeShortBatchJSONHandler() {
 	handlers := handler.NewExampleHandlers()
 
 	echo := handlers.Echo
-	handlers.UrlService.SetHasURLs(true)
+	handlers.URLService.SetHasURLs(true)
 
 	batchRequest := model.BatchShortURLRequest{
 		{

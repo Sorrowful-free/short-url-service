@@ -23,7 +23,7 @@ type ExampleTestHandlers struct {
 	Echo        *echo.Echo
 	Handlers    *Handlers
 	Config      *config.LocalConfig
-	UrlService  *service.ExampleURLService
+	URLService  *service.ExampleURLService
 	StatService *service.ExampleStatService
 }
 
@@ -76,7 +76,7 @@ func NewExampleHandlers() *ExampleTestHandlers {
 		Echo:        echo,
 		Handlers:    handlers,
 		Config:      config,
-		UrlService:  urlService,
+		URLService:  urlService,
 		StatService: statService,
 	}
 }

@@ -14,7 +14,7 @@ func ExampleHandlers_RegisterGetUserUrlsHandler() {
 	handlers := handler.NewExampleHandlers()
 
 	echo := handlers.Echo
-	handlers.UrlService.SetHasURLs(true)
+	handlers.URLService.SetHasURLs(true)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/user/urls", nil)
 	rec := httptest.NewRecorder()
@@ -40,7 +40,7 @@ func ExampleHandlers_RegisterGetUserUrlsHandler_noContent() {
 	handlers := handler.NewExampleHandlers()
 
 	echo := handlers.Echo
-	handlers.UrlService.SetHasURLs(false)
+	handlers.URLService.SetHasURLs(false)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/user/urls", nil)
 	rec := httptest.NewRecorder()
