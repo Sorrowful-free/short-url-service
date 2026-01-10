@@ -31,7 +31,7 @@ func ExampleHandlers_RegisterMakeShortHandler_conflict() {
 	handlers := handler.NewExampleHandlers()
 
 	echo := handlers.Echo
-	handlers.UrlService.SetConflictUrl("https://example.com/existing/url")
+	handlers.UrlService.SetConflictURL("https://example.com/existing/url")
 
 	originalURL := "https://example.com/existing/url"
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(originalURL))

@@ -43,7 +43,7 @@ func ExampleHandlers_RegisterMakeShortJSONHandler_conflict() {
 	handlers := handler.NewExampleHandlers()
 
 	echo := handlers.Echo
-	handlers.UrlService.SetConflictUrl("https://example.com/existing/url")
+	handlers.UrlService.SetConflictURL("https://example.com/existing/url")
 
 	requestBody := model.ShortURLRequest{
 		OriginalURL: "https://example.com/existing/url",
