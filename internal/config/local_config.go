@@ -10,6 +10,7 @@ import (
 
 type LocalConfig struct {
 	ListenAddr      string `json:"server_address"`
+	GRPCListenAddr  string `json:"grpc_server_address"`
 	BaseURL         string `json:"base_url"`
 	UIDLength       int    `json:"uid_lenth"`
 	UIDRetryCount   int    `json:"uid_retry_count"`
@@ -41,6 +42,7 @@ func GetLocalConfig() *LocalConfig {
 
 	//default values takes from flags
 	flag.StringVar(&localConfig.ListenAddr, "a", "localhost:8080", "listen address")
+	flag.StringVar(&localConfig.GRPCListenAddr, "ga", "localhost:8081", "gRPC listen address")
 	flag.StringVar(&localConfig.BaseURL, "b", "http://localhost:8080", "base URL")
 	flag.IntVar(&localConfig.UIDLength, "l", 8, "length of the short URL")
 	flag.IntVar(&localConfig.UIDRetryCount, "r", 10, "retry count for the short URL")
@@ -60,6 +62,11 @@ func GetLocalConfig() *LocalConfig {
 	serverAddress := os.Getenv("SERVER_ADDRESS")
 	if serverAddress != "" {
 		localConfig.ListenAddr = serverAddress
+	}
+
+	grpcServerAddress := os.Getenv("GRPC_SERVER_ADDRESS")
+	if grpcServerAddress != "" {
+		localConfig.GRPCListenAddr = grpcServerAddress
 	}
 
 	baseURL := os.Getenv("BASE_URL")

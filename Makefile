@@ -22,6 +22,9 @@ migrate-reset:
 gen_mocks:
 	mockgen -source=internal/service/short_url_service.go -destination=mocks/mock_short_url_service.go -package=mocks
 	mockgen -source=internal/repository/short_url_repository.go -destination=mocks/mock_short_url_repository.go -package=mocks
+
+gen_proto:
+	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative api/shortener.proto
 	
 test:
 	make gen_mocks
