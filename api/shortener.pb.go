@@ -7,11 +7,12 @@
 package api
 
 import (
+	reflect "reflect"
+	sync "sync"
+
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	reflect "reflect"
-	sync "sync"
 )
 
 const (
@@ -376,10 +377,10 @@ var file_api_shortener_proto_goTypes = []interface{}{
 	(*URLShortenRequest)(nil),  // 0: api.URLShortenRequest
 	(*URLShortenResponse)(nil), // 1: api.URLShortenResponse
 	(*URLExpandRequest)(nil),   // 2: api.URLExpandRequest
-	(*URLExpandResponse)(nil), // 3: api.URLExpandResponse
-	(*URLData)(nil),           // 4: api.URLData
-	(*UserURLsResponse)(nil),  // 5: api.UserURLsResponse
-	(*emptypb.Empty)(nil),     // 6: google.protobuf.Empty
+	(*URLExpandResponse)(nil),  // 3: api.URLExpandResponse
+	(*URLData)(nil),            // 4: api.URLData
+	(*UserURLsResponse)(nil),   // 5: api.UserURLsResponse
+	(*emptypb.Empty)(nil),      // 6: google.protobuf.Empty
 }
 var file_api_shortener_proto_depIdxs = []int32{
 	4, // 0: api.UserURLsResponse.url:type_name -> api.URLData
@@ -400,80 +401,6 @@ func init() { file_api_shortener_proto_init() }
 func file_api_shortener_proto_init() {
 	if File_api_shortener_proto != nil {
 		return
-	}
-	if !protoimpl.UnsafeEnabled {
-		file_api_shortener_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*URLShortenRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_api_shortener_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*URLShortenResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_api_shortener_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*URLExpandRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_api_shortener_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*URLExpandResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_api_shortener_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*URLData); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_api_shortener_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserURLsResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
