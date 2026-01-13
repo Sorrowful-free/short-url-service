@@ -37,35 +37,31 @@ func (h *GRPCHandler) getUserIDFromMetadata(ctx context.Context) (string, error)
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		// If no metadata, generate a new user ID
-		userID, err := crypto.GenerateRandomSequenceString(consts.TestUserIDLength)
-		if err != nil {
-			return consts.FallbackUserID, nil
-		}
-		return userID, nil
+		return h.generateRandomUserID()
 	}
 
 	authHeaders := md.Get("authorization")
 	if len(authHeaders) == 0 || authHeaders[0] == "" {
 		// If no authorization header, generate a new user ID
-		userID, err := crypto.GenerateRandomSequenceString(consts.TestUserIDLength)
-		if err != nil {
-			return consts.FallbackUserID, nil
-		}
-		return userID, nil
+		return h.generateRandomUserID()
 	}
 
 	// Decrypt the user ID from the authorization header
 	userID, err := h.userIDEncryptor.Decrypt(authHeaders[0])
 	if err != nil {
 		// If decryption fails, generate a new user ID
-		newUserID, genErr := crypto.GenerateRandomSequenceString(consts.TestUserIDLength)
-		if genErr != nil {
-			return consts.FallbackUserID, nil
-		}
-		return newUserID, nil
+		return h.generateRandomUserID()
 	}
 
 	return userID, nil
+}
+
+func (h *GRPCHandler) generateRandomUserID() (string, error) {
+	newUserID, genErr := crypto.GenerateRandomSequenceString(consts.TestUserIDLength)
+	if genErr != nil {
+		return consts.FallbackUserID, nil
+	}
+	return newUserID, nil
 }
 
 // ShortenURL creates a short URL from the provided original URL
