@@ -10,6 +10,7 @@ import (
 
 type LocalConfig struct {
 	ListenAddr      string `json:"server_address"`
+	GRPCListenAddr  string `json:"grpc_server_address"`
 	BaseURL         string `json:"base_url"`
 	UIDLength       int    `json:"uid_lenth"`
 	UIDRetryCount   int    `json:"uid_retry_count"`
@@ -23,7 +24,8 @@ type LocalConfig struct {
 	AuditFilePath string `json:"audit_file"`
 	AuditURL      string `json:"audit_url"`
 
-	IsSecure bool `json:"enable_https"`
+	IsSecure      bool   `json:"enable_https"`
+	TrustedSubnet string `json:"trusted_subnet"`
 }
 
 var localConfig *LocalConfig
@@ -40,6 +42,7 @@ func GetLocalConfig() *LocalConfig {
 
 	//default values takes from flags
 	flag.StringVar(&localConfig.ListenAddr, "a", "localhost:8080", "listen address")
+	flag.StringVar(&localConfig.GRPCListenAddr, "ga", "localhost:8081", "gRPC listen address")
 	flag.StringVar(&localConfig.BaseURL, "b", "http://localhost:8080", "base URL")
 	flag.IntVar(&localConfig.UIDLength, "l", 8, "length of the short URL")
 	flag.IntVar(&localConfig.UIDRetryCount, "r", 10, "retry count for the short URL")
@@ -52,12 +55,18 @@ func GetLocalConfig() *LocalConfig {
 	flag.StringVar(&localConfig.AuditFilePath, "audit-file", "", "audit file path")
 	flag.StringVar(&localConfig.AuditURL, "audit-url", "", "audit URL")
 	flag.BoolVar(&localConfig.IsSecure, "s", false, "is that server will use https protocol")
+	flag.StringVar(&localConfig.TrustedSubnet, "t", "", "trusted subnet for stat endpoint")
 	flag.Parse()
 
 	//override default values with values from environment variables if they are set
 	serverAddress := os.Getenv("SERVER_ADDRESS")
 	if serverAddress != "" {
 		localConfig.ListenAddr = serverAddress
+	}
+
+	grpcServerAddress := os.Getenv("GRPC_SERVER_ADDRESS")
+	if grpcServerAddress != "" {
+		localConfig.GRPCListenAddr = grpcServerAddress
 	}
 
 	baseURL := os.Getenv("BASE_URL")
@@ -121,6 +130,11 @@ func GetLocalConfig() *LocalConfig {
 	isSecure, ok := os.LookupEnv("ENABLE_HTTPS")
 	if ok {
 		localConfig.IsSecure = isSecure == "true"
+	}
+
+	trustedSubned := os.Getenv("TRUSTED_SUBNET")
+	if trustedSubned != "" {
+		localConfig.TrustedSubnet = trustedSubned
 	}
 
 	return localConfig

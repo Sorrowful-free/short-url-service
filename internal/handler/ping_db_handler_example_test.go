@@ -6,25 +6,18 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/Sorrowful-free/short-url-service/internal/config"
 	"github.com/Sorrowful-free/short-url-service/internal/handler"
-	"github.com/Sorrowful-free/short-url-service/internal/service"
-	"github.com/labstack/echo/v4"
 )
 
 func ExampleHandlers_RegisterPingDBHandler() {
-	e := echo.New()
+	handlers := handler.NewExampleHandlers()
 
-	urlService := &service.ExampleService{PingError: false}
-
-	config := config.GetLocalConfig()
-
-	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
-	handlers.RegisterHandlers()
+	echo := handlers.Echo
+	handlers.URLService.SetPingError(false)
 
 	req := httptest.NewRequest(http.MethodGet, "/ping", nil)
 	rec := httptest.NewRecorder()
-	e.ServeHTTP(rec, req)
+	echo.ServeHTTP(rec, req)
 
 	fmt.Printf("Status: %d\n", rec.Code)
 	fmt.Printf("Body: %s\n", strings.TrimSpace(rec.Body.String()))
@@ -35,16 +28,14 @@ func ExampleHandlers_RegisterPingDBHandler() {
 }
 
 func ExampleHandlers_RegisterPingDBHandler_error() {
-	e := echo.New()
-	urlService := &service.ExampleService{PingError: true}
-	config := config.GetLocalConfig()
+	handlers := handler.NewExampleHandlers()
 
-	handlers, _ := handler.NewHandlers(e, "http://localhost:8080", urlService, config)
-	handlers.RegisterHandlers()
+	echo := handlers.Echo
+	handlers.URLService.SetPingError(true)
 
 	req := httptest.NewRequest(http.MethodGet, "/ping", nil)
 	rec := httptest.NewRecorder()
-	e.ServeHTTP(rec, req)
+	echo.ServeHTTP(rec, req)
 
 	fmt.Printf("Status: %d\n", rec.Code)
 	fmt.Printf("Body: %s\n", strings.TrimSpace(rec.Body.String()))

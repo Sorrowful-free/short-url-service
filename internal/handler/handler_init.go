@@ -20,10 +20,11 @@ const (
 // Handlers manages HTTP handlers for the short URL service.
 // It encapsulates the Echo router, base URL, service layer, and configuration.
 type Handlers struct {
-	internalEcho       *echo.Echo
-	internalBaseURL    string
-	internalURLService service.ShortURLService
-	internalConfig     *config.LocalConfig
+	internalEcho        *echo.Echo
+	internalBaseURL     string
+	internalURLService  service.ShortURLService
+	internalStatService service.StatService
+	internalConfig      *config.LocalConfig
 }
 
 // NewHandlers creates a new Handlers instance with the provided dependencies.
@@ -34,12 +35,14 @@ type Handlers struct {
 //   - config: the application configuration (currently unused)
 //
 // Returns a Handlers instance and an error if initialization fails.
-func NewHandlers(echo *echo.Echo, baseURL string, urlService service.ShortURLService, config *config.LocalConfig) (*Handlers, error) {
+func NewHandlers(echo *echo.Echo, urlService service.ShortURLService, statService service.StatService, config *config.LocalConfig) (*Handlers, error) {
 
 	return &Handlers{
-		internalEcho:       echo,
-		internalBaseURL:    baseURL,
-		internalURLService: urlService,
+		internalEcho:        echo,
+		internalBaseURL:     config.BaseURL,
+		internalURLService:  urlService,
+		internalStatService: statService,
+		internalConfig:      config,
 	}, nil
 }
 

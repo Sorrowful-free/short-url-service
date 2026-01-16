@@ -93,6 +93,21 @@ func (mr *MockShortURLRepositoryMockRecorder) GetByUID(ctx, shortUID interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUID", reflect.TypeOf((*MockShortURLRepository)(nil).GetByUID), ctx, shortUID)
 }
 
+// GetStats mocks base method.
+func (m *MockShortURLRepository) GetStats(ctx context.Context) (model.StatDto, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetStats", ctx)
+	ret0, _ := ret[0].(model.StatDto)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetStats indicates an expected call of GetStats.
+func (mr *MockShortURLRepositoryMockRecorder) GetStats(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStats", reflect.TypeOf((*MockShortURLRepository)(nil).GetStats), ctx)
+}
+
 // GetUserUrls mocks base method.
 func (m *MockShortURLRepository) GetUserUrls(ctx context.Context, userID string) ([]model.ShortURLDto, error) {
 	m.ctrl.T.Helper()

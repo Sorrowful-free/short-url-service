@@ -137,3 +137,19 @@ func (r *SimpleShortURLRepository) DeleteShortURLs(ctx context.Context, userID s
 func (r *SimpleShortURLRepository) Ping(ctx context.Context) error {
 	return nil
 }
+
+func (r *SimpleShortURLRepository) GetStats(ctx context.Context) (model.StatDto, error) {
+	if ctx.Err() != nil {
+		return model.StatDto{}, ctx.Err()
+	}
+
+	totalUrls := 0
+	for _, shortURLs := range r.userShortURLs {
+		totalUrls += len(shortURLs)
+	}
+
+	return model.StatDto{
+		Urls:  totalUrls,
+		Users: len(r.userShortURLs),
+	}, nil
+}

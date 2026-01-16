@@ -18,4 +18,5 @@ const (
 	TestInvalidUserID       = "invalid user ID"
 	TestUserIDLength        = 8
 	TestUserIDCriptoKey     = "supersecretkey"
+	FallbackUserID          = "0000000000000000"
 )

@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package api;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/Sorrowful-free/short-url-service/api";
+
+// ShortenerService provides URL shortening functionality via gRPC
+service ShortenerService {
+  // ShortenURL creates a short URL from the provided original URL
+  rpc ShortenURL (URLShortenRequest) returns (URLShortenResponse);
+  
+  // ExpandURL retrieves the original URL for the given short URL ID
+  rpc ExpandURL (URLExpandRequest) returns (URLExpandResponse);
+  
+  // ListUserURLs returns all URLs associated with the authenticated user
+  rpc ListUserURLs (google.protobuf.Empty) returns (UserURLsResponse);
+}
+
+// URLShortenRequest contains the original URL to be shortened
+message URLShortenRequest {
+  string url = 1;
+}
+
+// URLShortenResponse contains the resulting short URL
+message URLShortenResponse {
+  string result = 1;
+}
+
+// URLExpandRequest contains the short URL ID to expand
+message URLExpandRequest {
+  string id = 1;
+}
+
+// URLExpandResponse contains the original URL
+message URLExpandResponse {
+  string result = 1;
+}
+
+// UserURLsResponse contains a list of URLs for the authenticated user
+message UserURLsResponse {
+  repeated URLData url = 1;
+}
+
+// URLData represents a single URL entry with short and original URLs
+message URLData {
+  string short_url = 1;
+  string original_url = 2;
+}
